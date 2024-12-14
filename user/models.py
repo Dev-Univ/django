@@ -18,7 +18,7 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=50)
     is_active = models.BooleanField(default=True)
@@ -37,7 +37,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
 
     # 학교 정보
     school = models.CharField(max_length=100, blank=True)

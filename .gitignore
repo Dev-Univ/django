@@ -1,1 +1,4 @@
 /secrets.json
+/user/migrations/
+/project/migrations/
+/db.sqlite3
