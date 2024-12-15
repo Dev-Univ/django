@@ -70,6 +70,8 @@ INSTALLED_APPS = [
     'corsheaders',
     # custom apps
     "user",
+    "univ",
+    "project",
 ]
 
 MIDDLEWARE = [
@@ -181,7 +183,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'EXCEPTION_HANDLER': 'devu.exceptions.custom_exception_handler'
+    # 'EXCEPTION_HANDLER': 'devu.exceptions.custom_exception_handler'
 }
 
 # JWT 설정

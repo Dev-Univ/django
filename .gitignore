@@ -2,3 +2,5 @@
 /user/migrations/
 /project/migrations/
 /db.sqlite3
+/univ/migrations/
+/project/migrations/
