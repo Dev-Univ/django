@@ -8,3 +8,6 @@ class UnivService:
 
     def get_univ(self, univ_id):
         return Univ.objects.get(pk=univ_id)
+
+    def get_all_univs(self):
+        return Univ.objects.all()

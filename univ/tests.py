@@ -18,6 +18,9 @@ class UnivTestCase(TestCase):
         self.univ = Univ.objects.create(
             name="서울대학교", description="대학교 설명 예시", region="서울"
         )
+        self.univ2 = Univ.objects.create(
+            name="연세대학교", description="대학교 설명 예시", region="서울"
+        )
 
     def test_get_univ(self):
         self.client.force_authenticate(user=self.user)
@@ -35,3 +38,11 @@ class UnivTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_all_univs(self):
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse("univ")
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
