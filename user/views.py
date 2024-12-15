@@ -1,8 +1,8 @@
 from django.conf import settings
-from django.contrib.sites import requests
+import requests
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
-from rest_framework import status, request
+from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -42,7 +42,6 @@ class UserProfileView(GenericAPIView):
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
 
-# todo: 나중에 kakao login 도 Serializer 만들어야함
 class KakaoLoginView(APIView):
     def get(self, request):
         client_id = settings.KAKAO_CONFIG['KAKAO_REST_API_KEY']
@@ -56,12 +55,14 @@ class KakaoLoginView(APIView):
 class KakaoCallbackView(APIView):
     def get(self, request):
         code = request.GET.get('code')
+
         if not code:
             return Response({'error': 'Authentication code not provided'},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # 액세스 토큰 받기
         token_response = self.get_kakao_token(code)
+        print(token_response)
         if not token_response.get('access_token'):
             return Response({'error': 'Failed to get access token'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -93,6 +94,9 @@ class KakaoCallbackView(APIView):
         client_secret = settings.KAKAO_CONFIG['KAKAO_CLIENT_SECRET']
 
         token_url = "https://kauth.kakao.com/oauth/token"
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+        }
         data = {
             'grant_type': 'authorization_code',
             'client_id': client_id,
@@ -101,7 +105,7 @@ class KakaoCallbackView(APIView):
             'client_secret': client_secret,
         }
 
-        response = requests.post(token_url, data=data)
+        response = requests.post(token_url, data=data, headers=headers)
         return response.json()
 
     def get_kakao_user_info(self, access_token):
