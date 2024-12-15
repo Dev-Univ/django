@@ -40,10 +40,10 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
 
     # 학교 정보
-    school = models.CharField(max_length=100, blank=True)
-    major = models.CharField(max_length=100, blank=True)
+    school = models.CharField(max_length=100)
+    major = models.CharField(max_length=100)
 
     # 프로필 정보
     self_introduction = models.TextField(blank=True)
-    github_url = models.URLField(blank=True)
+    github_url = models.TextField(blank=True)
     is_profile_private = models.BooleanField(default=False)

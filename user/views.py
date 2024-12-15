@@ -1,15 +1,36 @@
 from django.conf import settings
+from django.contrib.sites import requests
 from django.shortcuts import redirect
-from rest_framework import status
+from rest_framework import status, request
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-import requests
 from django.contrib.auth import get_user_model
+from .serializers import UserProfileRequestSerializer, UserProfileResponseSerializer
+from .services import UserService
 
 User = get_user_model()
 
 
+class UpdateUserProfileView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = UserProfileRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        userService = UserService(user=request.user)
+
+        # 유저 프로필 업데이트 (만약 처음이라면 생성)
+        updated_profile = userService.update_user_profile(serializer.validated_data)
+        response_serializer = UserProfileResponseSerializer(updated_profile)
+
+        return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+
+
+# todo: 나중에 kakao login 도 Serializer 만들어야함
 class KakaoLoginView(APIView):
     def get(self, request):
         client_id = settings.KAKAO_CONFIG['KAKAO_REST_API_KEY']
