@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.sites import requests
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from rest_framework import status, request
 from rest_framework.generics import GenericAPIView
@@ -14,14 +15,25 @@ from .services import UserService
 User = get_user_model()
 
 
-class UpdateUserProfileView(GenericAPIView):
+class UserProfileView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        userService = UserService(user=request.user)
+
+        try:
+            profile = userService.get_user_profile()
+            serializer = UserProfileResponseSerializer(profile)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        # 유저 프로필 생성 전
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request, *args, **kwargs):
+        userService = UserService(user=request.user)
+
         serializer = UserProfileRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        userService = UserService(user=request.user)
 
         # 유저 프로필 업데이트 (만약 처음이라면 생성)
         updated_profile = userService.update_user_profile(serializer.validated_data)

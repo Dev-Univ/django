@@ -4,7 +4,7 @@ from dj_rest_auth.registration.views import RegisterView
 from dj_rest_auth.views import LoginView, LogoutView
 from rest_framework_simplejwt.views import TokenVerifyView
 
-from user.views import KakaoLoginView, KakaoCallbackView, UpdateUserProfileView
+from user.views import KakaoLoginView, KakaoCallbackView, UserProfileView
 
 urlpatterns = [
     # dj-rest-auth URLs
@@ -19,5 +19,5 @@ urlpatterns = [
     path('kakao/callback/', KakaoCallbackView.as_view(), name='kakao-callback'),
 
     # 사용자 프로필
-    path('profile/', UpdateUserProfileView.as_view(), name='update-user-profile'),
+    path('profile/', UserProfileView.as_view(), name='user-profile'),
 ]

@@ -9,6 +9,11 @@ class UserService:
         self.user = user
 
     @transaction.atomic
+    def get_user_profile(self):
+        # OnetoOne 관계라 objects 필요 없을 듯
+        return self.user.profile
+
+    @transaction.atomic
     def update_user_profile(self, profile_data):
         # 유저 프로필이 있으면 가져오고 없으면 생성
         profile, created = UserProfile.objects.get_or_create(user=self.user)
