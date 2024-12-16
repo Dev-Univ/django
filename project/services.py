@@ -33,6 +33,20 @@ class ProjectService:
         except Exception as e:
             raise Exception(f"Failed to create project: {str(e)}")
 
+    @transaction.atomic
+    def get_project(self, project_id):
+        return Project.objects.prefetch_related(
+            'features',
+            'additional_images'
+        ).get(id=project_id)
+
+    @transaction.atomic
+    def get_projects(self):
+        return Project.objects.prefetch_related(
+            'features',
+            'additional_images'
+        ).all()
+
     def _create_project_with_main_image(self, data):
         main_image_url = self.upload_image_to_s3(data['main_image'], "projects/main")
         return Project.objects.create(
