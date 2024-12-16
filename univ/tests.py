@@ -24,7 +24,7 @@ class UnivTestCase(TestCase):
 
     def test_get_univ(self):
         self.client.force_authenticate(user=self.user)
-        self.url = reverse("univ", args=[self.univ.id])
+        self.url = reverse("univ-detail", args=[self.univ.id])
 
         response = self.client.get(self.url)
 
@@ -33,7 +33,7 @@ class UnivTestCase(TestCase):
 
     def test_get_failure(self):
         self.client.force_authenticate(user=self.user)
-        self.url = reverse("univ", args=[100])
+        self.url = reverse("univ-detail", args=[100])
 
         response = self.client.get(self.url)
 
