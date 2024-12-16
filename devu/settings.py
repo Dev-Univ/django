@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
     'corsheaders',
+    'boto3',
     # custom apps
     "user",
     "univ",
@@ -230,3 +231,9 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_AUTO_SIGNUP = True          # 소셜 로그인 시 자동 회원가입
 # SOCIALACCOUNT_EMAIL_REQUIRED = True        # 소셜 계정에서도 이메일 필수
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # 소셜 계정 이메일 인증 불필요
+
+# s3
+AWS_ACCESS_KEY_ID = get_secret("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = get_secret("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = 'devu-project-images'
+AWS_S3_REGION_NAME = 'ap-northeast-2'
