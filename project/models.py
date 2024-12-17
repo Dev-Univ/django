@@ -39,5 +39,13 @@ class TechStack(models.Model):
     title = models.CharField(max_length=100)
     category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
     sub_category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
-    project = models.ForeignKey(Project, related_name='tech_stacks', on_delete=models.CASCADE, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
+
+class ProjectTechStack(models.Model):
+    project = models.ForeignKey(Project, related_name='tech_stacks', on_delete=models.CASCADE)
+    tech_stack = models.ForeignKey(TechStack, related_name='projects', on_delete=models.CASCADE)
+
+
+class UserTechStack(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    teck_stack = models.ForeignKey(TechStack, related_name='users', on_delete=models.CASCADE)
