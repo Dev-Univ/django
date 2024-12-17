@@ -1,8 +1,7 @@
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from user.models import User
-from .choices import ProjectMemberRole
+from .choices import ProjectMemberRole, TechStackCategoryChoices
 
 
 class Project(models.Model):
@@ -35,3 +34,10 @@ class ProjectMember(models.Model):
     role = models.CharField(max_length=100, choices=ProjectMemberRole.choices, default=ProjectMemberRole.MEMBER)
     joined_at = models.DateTimeField(auto_now_add=True)
 
+
+class TechStack(models.Model):
+    title = models.CharField(max_length=100)
+    category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
+    sub_category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
+    project = models.ForeignKey(Project, related_name='tech_stacks', on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
