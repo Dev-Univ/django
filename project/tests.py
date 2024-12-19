@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase, APIClient
 from PIL import Image
 import io
 
-from project.models import Project
+from project.models import Project, TechStack
 from user.models import User
 
 
@@ -33,6 +33,16 @@ class ProjectTests(APITestCase):
             email="test@naver.com", name="tester", password="password"
         )
         self.image_file = create_test_image()
+        self.tech_stack1 = TechStack.objects.create(
+            title="Python",
+            category="SERVER",
+            sub_category="BACKEND"
+        )
+        self.tech_stack2 = TechStack.objects.create(
+            title="React",
+            category="CLIENT",
+            sub_category="WEB_FRONTEND"
+        )
         self.project = Project.objects.create(
             title="Test Project",
             is_done=False,
@@ -61,8 +71,12 @@ class ProjectTests(APITestCase):
             "description": "Detailed test description",
             "main_image": self.image_file,
             "features": [
-                {"description": "Feature 1"},
-                {"description": "Feature 2"}
+                "Feature 1",
+                "Feature 2"
+            ],
+            "tech_stacks": [
+                self.tech_stack1.id,
+                self.tech_stack2.id
             ],
             "additional_images": []
         }
@@ -74,6 +88,7 @@ class ProjectTests(APITestCase):
         self.assertEqual(response.data['short_description'], request['short_description'])
         self.assertEqual(response.data['description'], request['description'])
         self.assertIsNotNone(response.data['main_image_url'])
+        self.assertEqual(len(response.data['tech_stacks']), 2)
 
     def test_get_project_detail_success(self):
         url = reverse("project-detail", args=[self.project.id])

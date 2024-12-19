@@ -15,16 +15,19 @@ class ProjectView(GenericAPIView):
     @permission_classes([AllowAny])
     def get(self, request):
         project_service = ProjectService(user=request.user)
+
         projects = project_service.get_projects()
         response_serializer = ProjectResponseSerializer(projects, many=True)
+
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
     @permission_classes([IsAuthenticated])
     def post(self, request):
+        project_service = ProjectService(user=request.user)
+
         request_serializer = ProjectRequestSerializer(data=request.data)
         request_serializer.is_valid(raise_exception=True)
 
-        project_service = ProjectService(user=request.user)
         project = project_service.create_project(request_serializer.validated_data)
 
         response_serializer = ProjectResponseSerializer(project)

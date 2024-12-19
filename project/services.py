@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from django.db import transaction
 
 from devu import settings
-from project.models import ProjectImage, Project, ProjectFeature
+from project.models import ProjectImage, Project, ProjectFeature, TechStack, ProjectTechStack
 
 
 class ProjectService:
@@ -23,10 +23,13 @@ class ProjectService:
         try:
             project = self._create_project_with_main_image(validated_data)
             self._create_features(project, validated_data.get('features', []))
+            self._create_tech_stacks(project, validated_data.get('tech_stacks', []))
             self._create_additional_images(project, validated_data.get('additional_images', []))
 
+            # prefetch_related는 역참조할 때 주로 사용함
             return Project.objects.prefetch_related(
                 'features',
+                'tech_stacks__tech_stack',
                 'additional_images'
             ).get(id=project.id)
 
@@ -37,6 +40,7 @@ class ProjectService:
     def get_project(self, project_id):
         return Project.objects.prefetch_related(
             'features',
+            'tech_stacks__tech_stack',
             'additional_images'
         ).get(id=project_id)
 
@@ -44,6 +48,7 @@ class ProjectService:
     def get_projects(self):
         return Project.objects.prefetch_related(
             'features',
+            'tech_stacks__tech_stack',
             'additional_images'
         ).all()
 
@@ -65,10 +70,25 @@ class ProjectService:
         features = [
             ProjectFeature(
                 project=project,
-                description=feature_data['description']
+                description=feature_data
             ) for feature_data in features_data
         ]
         ProjectFeature.objects.bulk_create(features)
+
+    def _create_tech_stacks(self, project, tech_stacks_data):
+        if not tech_stacks_data:
+            return
+
+        existing_tech_stacks = TechStack.objects.filter(id__in=tech_stacks_data)
+
+        project_tech_stacks = [
+            ProjectTechStack(
+                project=project,
+                tech_stack=tech_stack
+            ) for tech_stack in existing_tech_stacks
+        ]
+
+        ProjectTechStack.objects.bulk_create(project_tech_stacks)
 
     def _create_additional_images(self, project, images):
         if not images:
