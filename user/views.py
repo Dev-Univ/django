@@ -3,40 +3,60 @@ import requests
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from rest_framework import status
+from rest_framework.decorators import permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from .serializers import UserProfileRequestSerializer, UserProfileResponseSerializer
+from .serializers import UserProfileRequestSerializer, UserSerializer
 from .services import UserService
 
 User = get_user_model()
 
 
-class UserProfileView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
+class UserView(GenericAPIView):
 
+    @permission_classes([IsAuthenticated])
+    def get(self, request):
+        userService = UserService(user=request.user)
+
+        try:
+            email = request.GET.get('email')
+            user = userService.get_user_by_email(email)
+
+            response_serializer = UserSerializer(user)
+            return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UserProfileView(GenericAPIView):
+
+    @permission_classes([IsAuthenticated])
     def get(self, request):
         userService = UserService(user=request.user)
 
         try:
             profile = userService.get_user_profile()
-            serializer = UserProfileResponseSerializer(profile)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+            response_serializer = UserProfileResponseSerializer(profile)
+            return Response(data=response_serializer.data, status=status.HTTP_200_OK)
         # 유저 프로필 생성 전
         except ObjectDoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @permission_classes([IsAuthenticated])
     def post(self, request, *args, **kwargs):
         userService = UserService(user=request.user)
 
-        serializer = UserProfileRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        request_serializer = UserProfileRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
 
         # 유저 프로필 업데이트 (만약 처음이라면 생성)
-        updated_profile = userService.update_user_profile(serializer.validated_data)
+        updated_profile = userService.update_user_profile(request_serializer.validated_data)
         response_serializer = UserProfileResponseSerializer(updated_profile)
 
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)

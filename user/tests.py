@@ -16,6 +16,15 @@ class UserProfileUpdateCase(APITestCase):
         self.user = User.objects.create(
             email="test@naver.com", name="tester", password="password"
         )
+        self.user2 = User.objects.create(
+            email="test2@naver.com", name="tester2", password="password"
+        )
+        self.user_profile = UserProfile.objects.create(
+            user=self.user2,
+            school="서울대학교",
+            major="컴퓨터공학과",
+            self_introduction="간단한 자기소개"
+        )
 
     def test_user_profile_update(self):
         self.client.force_authenticate(user=self.user)
@@ -59,7 +68,7 @@ class GetUserProfileTestCase(APITestCase):
             email="test2@naver.com", name="tester2", password="password2"
         )
         self.UserProfile = UserProfile.objects.create(
-            user=self.user,
+            user=self.user2,
             school="서울대학교",
             major="컴퓨터공학과",
             self_introduction="테스트 자기소개",
@@ -83,4 +92,19 @@ class GetUserProfileTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_get_user_by_email_success(self):
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse("user") + f"?email={self.user2.email}"
 
+        response = self.client.get(self.url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], str(self.user2.name))
+        self.assertEqual(response.data['school'], str(self.user2.profile.school))
+        self.assertEqual(response.data['major'], str(self.user2.profile.major))
+
+    def test_get_user_by_email_failure(self):
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse("user") + f"?email=fail@naver.com"
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

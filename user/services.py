@@ -1,12 +1,18 @@
 from django.db import transaction
 
-from user.models import UserProfile
+from user.models import UserProfile, User
 
 
 class UserService:
 
     def __init__(self, user, **kwargs):
         self.user = user
+
+    @transaction.atomic
+    def get_user_by_email(self, email):
+        return User.objects.select_related(
+            'profile'
+        ).get(email=email)
 
     @transaction.atomic
     def get_user_profile(self):
