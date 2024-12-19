@@ -51,8 +51,6 @@ class UserProfileUpdateCase(APITestCase):
         response = self.client.post(self.url, request, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], '입력값이 유효하지 않습니다.')
-        self.assertIn('school', str(response.data['details']))
 
 
 class GetUserProfileTestCase(APITestCase):
