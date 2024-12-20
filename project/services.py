@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from devu import settings
-from project.models import ProjectImage, Project, ProjectFeature, TechStack, ProjectTechStack, ProjectMember
+from project.models import ProjectImage, Project, ProjectFeature, TechStack, ProjectTechStack, ProjectMember, TimeLine
 from .choices import ProjectMemberRole
 
 User = get_user_model()
@@ -30,6 +30,7 @@ class ProjectService:
             self._create_tech_stacks(project, validated_data.get('tech_stacks', []))
             self._create_additional_images(project, validated_data.get('additional_images', []))
             self._create_project_members(project, validated_data.get('members', []))
+            self._create_time_line(project, validated_data.get('time_lines', []))
 
             # prefetch_related는 역참조할 때 주로 사용함
             return Project.objects.prefetch_related(
@@ -38,7 +39,8 @@ class ProjectService:
                 'additional_images',
                 'members',
                 'members__user',
-                'members__user__profile'
+                'members__user__profile',
+                'time_lines'
             ).get(id=project.id)
 
         except Exception as e:
@@ -134,6 +136,21 @@ class ProjectService:
 
         if project_members:
             ProjectMember.objects.bulk_create(project_members)
+
+    def _create_time_line(self, project, timelines_data):
+        if not timelines_data:
+            return
+
+        timelines = [
+            TimeLine(
+                project=project,
+                date=timeline['date'],
+                title=timeline['title'],
+                description=timeline['description']
+            ) for timeline in timelines_data
+        ]
+
+        TimeLine.objects.bulk_create(timelines)
 
     def upload_image_to_s3(self, image, folder: str = "projects") -> str:
         try:

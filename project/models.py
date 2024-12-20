@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from user.models import User
 from .choices import ProjectMemberRole, TechStackCategoryChoices
@@ -49,3 +50,10 @@ class ProjectTechStack(models.Model):
 class UserTechStack(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tech_stack = models.ForeignKey(TechStack, related_name='users', on_delete=models.CASCADE)
+
+
+class TimeLine(models.Model):
+    date = models.DateField(default=timezone.now)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    project = models.ForeignKey(Project, related_name='time_lines', on_delete=models.CASCADE)

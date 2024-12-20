@@ -8,6 +8,7 @@ import io
 from project.models import Project, TechStack
 from user.models import User
 
+import json
 
 def create_test_image():
     # 100x100 크기의 RGB 이미지 생성
@@ -85,7 +86,19 @@ class ProjectTests(APITestCase):
             "additional_images": [],
             "members": [
                 self.user2.email
-            ]
+            ],
+            "time_lines": json.dumps([
+                {
+                    "date": "2020-10-19",
+                    "title": "Project Start",
+                    "description": "Initial project planning phase"
+                },
+                {
+                    "date": "2020-10-20",
+                    "title": "Phase 1",
+                    "description": "Development phase 1 completion"
+                }
+            ])
         }
 
         response = self.client.post(self.url, request, format='multipart')
@@ -97,6 +110,7 @@ class ProjectTests(APITestCase):
         self.assertIsNotNone(response.data['main_image_url'])
         self.assertEqual(len(response.data['tech_stacks']), 2)
         self.assertEqual(len(response.data['members']), 2)
+        self.assertEqual(len(response.data['time_lines']), 2)
 
     def test_get_project_detail_success(self):
         url = reverse("project-detail", args=[self.project.id])
