@@ -29,10 +29,10 @@ class ProjectImage(models.Model):
 
 
 class ProjectMember(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=100, choices=ProjectMemberRole.choices, default=ProjectMemberRole.MEMBER)
     joined_at = models.DateTimeField(auto_now_add=True)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members')
 
 
 class TechStack(models.Model):

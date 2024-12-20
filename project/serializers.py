@@ -17,6 +17,7 @@ class ProjectRequestSerializer(serializers.Serializer):
     main_image = serializers.ImageField()
     features = serializers.ListField(child=serializers.CharField())
     tech_stacks = serializers.ListField(child=serializers.IntegerField())
+    members = serializers.ListField(child=serializers.EmailField())
 
 
 class ProjectImageResponseSerializer(serializers.Serializer):
@@ -36,6 +37,15 @@ class ProjectTechStackResponseSerializer(serializers.Serializer):
     sub_category = serializers.CharField(source='tech_stack.sub_category')
 
 
+class ProjectMemberResponseSerializer(serializers.Serializer):
+    email = serializers.EmailField(source='user.email')
+    name = serializers.CharField(source='user.name')
+    school = serializers.CharField(source='user.profile.school')
+    self_introduction = serializers.CharField(source='user.profile.self_introduction')
+    github_url = serializers.CharField(source='user.profile.github_url')
+    role = serializers.CharField()
+
+
 class ProjectResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=100)
@@ -46,3 +56,5 @@ class ProjectResponseSerializer(serializers.Serializer):
     additional_images = ProjectImageResponseSerializer(many=True)
     features = ProjectFeatureResponseSerializer(many=True)
     tech_stacks = ProjectTechStackResponseSerializer(source='tech_stacks.all', many=True)
+    members = ProjectMemberResponseSerializer(source='members.all', many=True)
+

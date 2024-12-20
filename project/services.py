@@ -2,10 +2,14 @@ import uuid
 
 import boto3
 from botocore.exceptions import ClientError
+from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from devu import settings
-from project.models import ProjectImage, Project, ProjectFeature, TechStack, ProjectTechStack
+from project.models import ProjectImage, Project, ProjectFeature, TechStack, ProjectTechStack, ProjectMember
+from .choices import ProjectMemberRole
+
+User = get_user_model()
 
 
 class ProjectService:
@@ -25,12 +29,16 @@ class ProjectService:
             self._create_features(project, validated_data.get('features', []))
             self._create_tech_stacks(project, validated_data.get('tech_stacks', []))
             self._create_additional_images(project, validated_data.get('additional_images', []))
+            self._create_project_members(project, validated_data.get('members', []))
 
             # prefetch_related는 역참조할 때 주로 사용함
             return Project.objects.prefetch_related(
                 'features',
                 'tech_stacks__tech_stack',
-                'additional_images'
+                'additional_images',
+                'members',
+                'members__user',
+                'members__user__profile'
             ).get(id=project.id)
 
         except Exception as e:
@@ -101,6 +109,31 @@ class ProjectService:
             ) for image in images
         ]
         ProjectImage.objects.bulk_create(additional_images)
+
+    def _create_project_members(self, project, member_emails):
+        if not member_emails:
+            return
+
+        members = User.objects.filter(email__in=member_emails)
+
+        # 프로젝트 생성자를 OWNER로 추가
+        ProjectMember.objects.create(
+            project=project,
+            user=self.user,
+            role=ProjectMemberRole.LEADER
+        )
+
+        # 나머지 멤버들을 MEMBER로 추가
+        project_members = [
+            ProjectMember(
+                project=project,
+                user=member,
+                role=ProjectMemberRole.MEMBER
+            ) for member in members if member != self.user
+        ]
+
+        if project_members:
+            ProjectMember.objects.bulk_create(project_members)
 
     def upload_image_to_s3(self, image, folder: str = "projects") -> str:
         try:

@@ -32,6 +32,10 @@ class ProjectTests(APITestCase):
         self.user = User.objects.create_user(
             email="test@naver.com", name="tester", password="password"
         )
+        # 프로젝트 멤버 유저
+        self.user2 = User.objects.create_user(
+            email="test2@naver.com", name="tester2", password="password"
+        )
         self.image_file = create_test_image()
         self.tech_stack1 = TechStack.objects.create(
             title="Python",
@@ -78,7 +82,10 @@ class ProjectTests(APITestCase):
                 self.tech_stack1.id,
                 self.tech_stack2.id
             ],
-            "additional_images": []
+            "additional_images": [],
+            "members": [
+                self.user2.email
+            ]
         }
 
         response = self.client.post(self.url, request, format='multipart')
@@ -89,6 +96,7 @@ class ProjectTests(APITestCase):
         self.assertEqual(response.data['description'], request['description'])
         self.assertIsNotNone(response.data['main_image_url'])
         self.assertEqual(len(response.data['tech_stacks']), 2)
+        self.assertEqual(len(response.data['members']), 2)
 
     def test_get_project_detail_success(self):
         url = reverse("project-detail", args=[self.project.id])
