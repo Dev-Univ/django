@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "univ",
     "project",
     "theme",
+    "team",
 ]
 
 MIDDLEWARE = [
