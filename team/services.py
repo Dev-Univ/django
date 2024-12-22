@@ -20,6 +20,26 @@ class TeamService:
         except Exception as e:
             raise Exception(f"Failed to create team: {str(e)}")
 
+    @transaction.atomic
+    def get_teams(self):
+        try:
+            return Team.objects.prefetch_related(
+                'tech_stacks__tech_stack',
+                'positions'
+            ).all()
+        except Exception as e:
+            raise Exception(f"Failed to get teams: {str(e)}")
+
+    @transaction.atomic
+    def get_teams_by_user(self, user):
+        try:
+            return Team.objects.prefetch_related(
+                'tech_stacks__tech_stack',
+                'positions'
+            ).filter(user=user).all()
+        except Exception as e:
+            raise Exception(f"Failed to get teams by user: {str(e)}")
+
     def _create_proejct_with_validated_data(self, validated_data, user):
         return Team.objects.create(
             name=validated_data['name'],

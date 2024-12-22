@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from project.models import TechStack
+from team.models import Team, Position
 from user.models import User
 
 
@@ -15,6 +16,9 @@ class TeamTests(APITestCase):
         self.user = User.objects.create_user(
             email="test@naver.com", name="tester", password="password"
         )
+        self.user2 = User.objects.create_user(
+            email="test2@naver.com", name="tester2", password="password"
+        )
         self.tech_stack1 = TechStack.objects.create(
             title="Python",
             category="SERVER",
@@ -24,6 +28,24 @@ class TeamTests(APITestCase):
             title="React",
             category="CLIENT",
             sub_category="WEB_FRONTEND"
+        )
+        self.team = Team.objects.create(
+            name="Team 1",
+            description="Team description",
+            end_date="2020-10-20",
+            user=self.user
+        )
+        self.team2 = Team.objects.create(
+            name="Team 2",
+            description="Team description",
+            end_date="2020-10-20",
+            user=self.user2
+        )
+        self.position = Position.objects.create(
+            name="Position 1",
+            description="Position description",
+            is_open=False,
+            team=self.team
         )
 
     def test_post_team_success(self):
@@ -129,3 +151,21 @@ class TeamTests(APITestCase):
 
 
         # todo: 존재하지 않는 tech stack ID 테스트
+
+    def test_retrieve_teams_success(self):
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse("team")
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_retrieve_teams_by_user_success(self):
+        self.client.force_authenticate(user=self.user2)
+        self.url = reverse("my-teams")
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
