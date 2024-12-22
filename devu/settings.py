@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "project",
     "theme",
     "team",
+    "notice",
 ]
 
 MIDDLEWARE = [
