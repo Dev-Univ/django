@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from user.models import User
-from .choices import ProjectMemberRole, TechStackCategoryChoices
+from .choices import ProjectMemberRole, TechStackCategoryChoices, TechStackSubCategoryChoices
 
 
 class Project(models.Model):
@@ -39,7 +39,7 @@ class ProjectMember(models.Model):
 class TechStack(models.Model):
     title = models.CharField(max_length=100)
     category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
-    sub_category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
+    sub_category = models.CharField(max_length=100, choices=TechStackSubCategoryChoices.choices)
 
 
 class ProjectTechStack(models.Model):
