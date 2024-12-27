@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from .serializers import UserProfileRequestSerializer, UserSerializer, UserProfileResponseSerializer, \
+from .serializers import UserProfileRequestSerializer, UserSerializer, \
     PrivateUserProfileResponseSerializer, PublicUserProfileResponseSerializer
 from .services import UserService
 
@@ -47,8 +47,8 @@ class UserProfileView(GenericAPIView):
         request_serializer.is_valid(raise_exception=True)
 
         # 유저 프로필 업데이트 (만약 처음이라면 생성)
-        updated_profile = userService.update_user_profile(request_serializer.validated_data, request.user)
-        response_serializer = UserProfileResponseSerializer(updated_profile)
+        user = userService.update_user_profile(request_serializer.validated_data, request.user)
+        response_serializer = PrivateUserProfileResponseSerializer(user)
 
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
