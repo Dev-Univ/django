@@ -5,24 +5,18 @@ from user.models import UserProfile, User
 
 class UserService:
 
-    def __init__(self, user, **kwargs):
-        self.user = user
-
     @transaction.atomic
     def get_user_by_email(self, email):
         return User.objects.select_related(
-            'profile'
+            'profile',
+        ).prefetch_related(
+            'tech_stacks'
         ).get(email=email)
 
     @transaction.atomic
-    def get_user_profile(self):
-        # OnetoOne 관계라 objects 필요 없을 듯
-        return self.user.profile
-
-    @transaction.atomic
-    def update_user_profile(self, profile_data):
+    def update_user_profile(self, profile_data, user):
         # 유저 프로필이 있으면 가져오고 없으면 생성
-        profile, created = UserProfile.objects.get_or_create(user=self.user)
+        profile, created = UserProfile.objects.get_or_create(user=user)
 
         # 프로필 데이터에서 key에 해당하는 속성이 있으면 value할당
         for key, value in profile_data.items():

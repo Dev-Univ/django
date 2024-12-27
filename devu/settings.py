@@ -199,6 +199,7 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,                         # 마지막 로그인 시간 업데이트
     'ALGORITHM': 'HS256',
     'AUTH_HEADER_TYPES': ('Bearer',),                  # Bearer 인증 방식
+    'TOKEN_OBTAIN_SERIALIZER': 'users.serializers.CustomTokenObtainPairSerializer', # claim 커스터마이징
 }
 
 # dj-rest-auth 설정

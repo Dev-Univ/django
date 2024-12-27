@@ -5,58 +5,49 @@ from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.decorators import permission_classes
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from .serializers import UserProfileRequestSerializer, UserSerializer, UserProfileResponseSerializer
+from .serializers import UserProfileRequestSerializer, UserSerializer, UserProfileResponseSerializer, \
+    PrivateUserProfileResponseSerializer, PublicUserProfileResponseSerializer
 from .services import UserService
 
 User = get_user_model()
 
 
-class UserView(GenericAPIView):
+class UserProfileView(GenericAPIView):
+    serializer_class = UserSerializer
 
-    @permission_classes([IsAuthenticated])
-    def get(self, request):
-        userService = UserService(user=request.user)
+    @permission_classes([AllowAny])
+    def get(self, request, email):
+        userService = UserService()
 
         try:
-            email = request.GET.get('email')
+            token = request.auth
             user = userService.get_user_by_email(email)
 
-            response_serializer = UserSerializer(user)
+            # 자신의 프로필 조회
+            if token and email == token.payload['email']:
+                response_serializer = PrivateUserProfileResponseSerializer(user)
+            # 다른 유저가 프로필 조회
+            else:
+                response_serializer = PublicUserProfileResponseSerializer(user)
+
             return Response(data=response_serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except Exception:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class UserProfileView(GenericAPIView):
-
-    @permission_classes([IsAuthenticated])
-    def get(self, request):
-        userService = UserService(user=request.user)
-
-        try:
-            profile = userService.get_user_profile()
-            response_serializer = UserProfileResponseSerializer(profile)
-            return Response(data=response_serializer.data, status=status.HTTP_200_OK)
-        # 유저 프로필 생성 전
-        except ObjectDoesNotExist:
+        except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     @permission_classes([IsAuthenticated])
-    def post(self, request, *args, **kwargs):
-        userService = UserService(user=request.user)
+    def post(self, request, email):
+        userService = UserService()
 
         request_serializer = UserProfileRequestSerializer(data=request.data)
         request_serializer.is_valid(raise_exception=True)
 
         # 유저 프로필 업데이트 (만약 처음이라면 생성)
-        updated_profile = userService.update_user_profile(request_serializer.validated_data)
+        updated_profile = userService.update_user_profile(request_serializer.validated_data, request.user)
         response_serializer = UserProfileResponseSerializer(updated_profile)
 
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
@@ -98,6 +89,7 @@ class KakaoCallbackView(APIView):
 
         # JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
+        refresh['email'] = user.email  # 이메일 추가
 
         tokens = {
             'refresh': str(refresh),
@@ -105,7 +97,7 @@ class KakaoCallbackView(APIView):
         }
 
         # 프론트엔드로 리다이렉트 (토큰과 함께)
-        redirect_uri = f"http://localhost:3000/login/kakao-callback?access={tokens['access']}&refresh={tokens['refresh']}"
+        redirect_uri = f"http://localhost:3000/login/kakao-callback?access={tokens['access']}&refresh={tokens['refresh']}&email={user.email}"
         return redirect(redirect_uri)
 
     def get_kakao_token(self, code):

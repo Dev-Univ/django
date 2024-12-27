@@ -48,7 +48,7 @@ class ProjectTechStack(models.Model):
 
 
 class UserTechStack(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='tech_stacks', on_delete=models.CASCADE)
     tech_stack = models.ForeignKey(TechStack, related_name='users', on_delete=models.CASCADE)
 
 
