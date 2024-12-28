@@ -65,3 +65,5 @@ class PrivateUserProfileResponseSerializer(serializers.Serializer):
     github_url = serializers.CharField(max_length=255, source='profile.github_url')
     tech_stacks = UserProfileTechStackResponseSerializer(source='tech_stacks.all', many=True)
     is_profile_private = serializers.BooleanField(source='profile.is_profile_private')
+    is_my_profile = serializers.BooleanField(default=True)
+
