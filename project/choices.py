@@ -7,6 +7,13 @@ class ProjectMemberRole(TextChoices):
     MEMBER = "MEMBER", "팀원"
 
 
+class ProjectStatus(TextChoices):
+    PLANNING = "PLANNING", "계획중"
+    IN_PROGRESS = "IN_PROGRESS", "진행중"
+    SUSPENDED = "SUSPENDED", "중단"
+    COMPLETED = "COMPLETED", "완료"
+
+
 class TechStackCategoryChoices(TextChoices):
     CLIENT = 'CLIENT', '클라이언트 사이드'
     SERVER = 'SERVER', '서버 사이드'

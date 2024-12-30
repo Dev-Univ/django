@@ -5,8 +5,11 @@ from botocore.exceptions import ClientError
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
+import univ
 from devu import settings
-from project.models import ProjectImage, Project, ProjectFeature, TechStack, ProjectTechStack, ProjectMember, TimeLine
+from project.models import ProjectImage, Project, ProjectFeature, TechStack, ProjectTechStack, ProjectMember, TimeLine, \
+    ProjectUniv
+from univ.models import Univ
 from .choices import ProjectMemberRole
 
 User = get_user_model()
@@ -25,10 +28,12 @@ class ProjectService:
     @transaction.atomic
     def create_project(self, validated_data):
         try:
+            print(validated_data)
             project = self._create_project_with_main_image(validated_data)
+            self._create_additional_images(project, validated_data.get('additional_images', []))
             self._create_features(project, validated_data.get('features', []))
             self._create_tech_stacks(project, validated_data.get('tech_stacks', []))
-            self._create_additional_images(project, validated_data.get('additional_images', []))
+            self._create_univ(project, validated_data.get('univ', []))
             self._create_project_members(project, validated_data.get('members', []))
             self._create_time_line(project, validated_data.get('time_lines', []))
 
@@ -66,7 +71,7 @@ class ProjectService:
         main_image_url = self.upload_image_to_s3(data['main_image'], "projects/main")
         return Project.objects.create(
             title=data['title'],
-            is_done=data['is_done'],
+            status=data['status'],
             short_description=data['short_description'],
             description=data['description'],
             main_image_url=main_image_url,
@@ -100,6 +105,21 @@ class ProjectService:
 
         ProjectTechStack.objects.bulk_create(project_tech_stacks)
 
+    def _create_univ(self, project, univ_data):
+        if not univ_data:
+            return
+
+        existing_univ = Univ.objects.filter(id__in=univ_data)
+
+        project_univ = [
+            ProjectUniv(
+                project=project,
+                univ=univ
+            ) for univ in existing_univ
+        ]
+
+        ProjectUniv.objects.bulk_create(project_univ)
+
     def _create_additional_images(self, project, images):
         if not images:
             return
@@ -112,30 +132,39 @@ class ProjectService:
         ]
         ProjectImage.objects.bulk_create(additional_images)
 
-    def _create_project_members(self, project, member_emails):
-        if not member_emails:
+    def _create_project_members(self, project, members_data):
+        if not members_data:
             return
 
-        members = User.objects.filter(email__in=member_emails)
+        try:
+            print(members_data)
+            # members_data가 이미 dict 리스트인지 확인
+            if isinstance(members_data, str):
+                import json
+                members_data = json.loads(members_data)
 
-        # 프로젝트 생성자를 OWNER로 추가
-        ProjectMember.objects.create(
-            project=project,
-            user=self.user,
-            role=ProjectMemberRole.LEADER
-        )
+            # members_data는 [{'role': 'LEADER', 'user_email': 'test@test.com', 'description': '설명'}, ...] 형태
+            email_to_role = {member['user_email']: member['role'] for member in members_data}
+            email_to_description = {member['user_email']: member.get('description', '') for member in members_data}
+            emails = list(email_to_role.keys())
 
-        # 나머지 멤버들을 MEMBER로 추가
-        project_members = [
-            ProjectMember(
-                project=project,
-                user=member,
-                role=ProjectMemberRole.MEMBER
-            ) for member in members if member != self.user
-        ]
+            # 이메일로 유저들 조회
+            members = User.objects.filter(email__in=emails)
 
-        if project_members:
-            ProjectMember.objects.bulk_create(project_members)
+            # 각 유저별로 해당하는 role 적용
+            project_members = [
+                ProjectMember(
+                    project=project,
+                    user=member,
+                    role=email_to_role[member.email],
+                    description=email_to_description[member.email]
+                ) for member in members
+            ]
+
+            if project_members:
+                ProjectMember.objects.bulk_create(project_members)
+        except Exception as e:
+            raise Exception(f"Failed to create project members: {str(e)}")
 
     def _create_time_line(self, project, timelines_data):
         if not timelines_data:
@@ -146,7 +175,8 @@ class ProjectService:
                 project=project,
                 date=timeline['date'],
                 title=timeline['title'],
-                description=timeline['description']
+                description=timeline['description'],
+                order=timeline['order']
             ) for timeline in timelines_data
         ]
 

@@ -3,30 +3,31 @@ import json
 from rest_framework import serializers
 
 
-class ProjectFeatureRequestSerializer(serializers.Serializer):
+class ProjectMemberRequestSerializer(serializers.Serializer):
+    role = serializers.CharField()
+    user_email = serializers.EmailField()
     description = serializers.CharField()
-
-
-class ProjectTechStackRequestSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
 
 
 class TimeLineRequestSerializer(serializers.Serializer):
     date = serializers.DateField()
     title = serializers.CharField(max_length=100)
     description = serializers.CharField()
+    order = serializers.IntegerField()
 
 
 class ProjectRequestSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100)
-    is_done = serializers.BooleanField(default=False)
+    status = serializers.CharField(max_length=100)
     short_description = serializers.CharField()
     description = serializers.CharField()
     main_image = serializers.ImageField()
+    additional_images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=False)
     features = serializers.ListField(child=serializers.CharField())
     tech_stacks = serializers.ListField(child=serializers.IntegerField())
-    members = serializers.ListField(child=serializers.EmailField())
-    time_lines = serializers.JSONField()  # JSONField로 변경
+    univ = serializers.ListField(child=serializers.IntegerField())
+    members = serializers.JSONField()
+    time_lines = serializers.JSONField()
 
     # 어쩔 수 없이 JSON 문자열을 파싱하고 TimeLineRequestSerializer로 검증
     # todo: 어떻게든 이거 바꾸고싶은데..
@@ -38,6 +39,17 @@ class ProjectRequestSerializer(serializers.Serializer):
             data = value
 
         serializer = TimeLineRequestSerializer(data=data, many=True)
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data
+
+    def validate_members(self, value):
+
+        if isinstance(value, str):
+            data = json.loads(value)
+        else:
+            data = value
+
+        serializer = ProjectMemberRequestSerializer(data=data, many=True)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
@@ -78,7 +90,7 @@ class TimeLineResponseSerializer(serializers.Serializer):
 class ProjectResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=100)
-    is_done = serializers.BooleanField(default=False)
+    status = serializers.CharField(max_length=100)
     short_description = serializers.CharField()
     description = serializers.CharField()
     main_image_url = serializers.CharField(max_length=255)
