@@ -54,6 +54,11 @@ class ProjectRequestSerializer(serializers.Serializer):
         return serializer.validated_data
 
 
+class ProjectUserResponseSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    email = serializers.EmailField()
+
+
 class ProjectImageResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     image_url = serializers.CharField(max_length=255)
@@ -91,6 +96,7 @@ class TimeLineResponseSerializer(serializers.Serializer):
 
 class ProjectResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    user = ProjectUserResponseSerializer()
     title = serializers.CharField(max_length=100)
     status = serializers.CharField(max_length=100)
     short_description = serializers.CharField()
