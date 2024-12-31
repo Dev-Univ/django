@@ -77,6 +77,8 @@ class ProjectService:
         main_image_url = self.upload_image_to_s3(data['main_image'], "projects/main")
         return Project.objects.create(
             title=data['title'],
+            start_date=data['start_date'],
+            end_date=data['end_date'],
             status=data['status'],
             short_description=data['short_description'],
             description=data['description'],

@@ -8,6 +8,8 @@ from .choices import ProjectMemberRole, TechStackCategoryChoices, TechStackSubCa
 
 class Project(models.Model):
     title = models.CharField(max_length=100)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     status = models.CharField(choices=ProjectStatus.choices, max_length=100, default=ProjectStatus.COMPLETED)
     short_description = models.TextField()
     description = models.TextField()

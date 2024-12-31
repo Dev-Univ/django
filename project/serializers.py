@@ -18,6 +18,8 @@ class TimeLineRequestSerializer(serializers.Serializer):
 
 class ProjectRequestSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100)
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
     status = serializers.CharField(max_length=100)
     short_description = serializers.CharField()
     description = serializers.CharField()
@@ -98,6 +100,8 @@ class ProjectResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     user = ProjectUserResponseSerializer()
     title = serializers.CharField(max_length=100)
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
     status = serializers.CharField(max_length=100)
     short_description = serializers.CharField()
     description = serializers.CharField()
