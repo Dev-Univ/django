@@ -77,6 +77,7 @@ class ProjectMemberResponseSerializer(serializers.Serializer):
     school = serializers.CharField(source='user.profile.school')
     self_introduction = serializers.CharField(source='user.profile.self_introduction')
     github_url = serializers.CharField(source='user.profile.github_url')
+    description = serializers.CharField()
     role = serializers.CharField()
 
 
@@ -85,6 +86,7 @@ class TimeLineResponseSerializer(serializers.Serializer):
     date = serializers.DateField()
     title = serializers.CharField(max_length=100)
     description = serializers.CharField()
+    order = serializers.IntegerField()
 
 
 class ProjectResponseSerializer(serializers.Serializer):
@@ -96,7 +98,7 @@ class ProjectResponseSerializer(serializers.Serializer):
     main_image_url = serializers.CharField(max_length=255)
     additional_images = ProjectImageResponseSerializer(many=True)
     features = ProjectFeatureResponseSerializer(many=True)
-    tech_stacks = ProjectTechStackResponseSerializer(source='tech_stacks.all', many=True)
-    members = ProjectMemberResponseSerializer(source='members.all', many=True)
-    time_lines = TimeLineResponseSerializer(source='time_lines.all', many=True)
+    tech_stacks = ProjectTechStackResponseSerializer(many=True)
+    members = ProjectMemberResponseSerializer(many=True)
+    time_lines = TimeLineResponseSerializer(many=True)
 

@@ -4,6 +4,7 @@ import boto3
 from botocore.exceptions import ClientError
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import Prefetch
 
 import univ
 from devu import settings
@@ -64,8 +65,13 @@ class ProjectService:
         return Project.objects.prefetch_related(
             'features',
             'tech_stacks__tech_stack',
-            'additional_images'
-        ).all()
+            'additional_images',
+            Prefetch('members', queryset=ProjectMember.objects.select_related(
+                'user',
+                'user__profile'
+            )),
+            'time_lines'
+        ).order_by('-created_at')
 
     def _create_project_with_main_image(self, data):
         main_image_url = self.upload_image_to_s3(data['main_image'], "projects/main")

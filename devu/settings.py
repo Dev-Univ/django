@@ -187,6 +187,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    "PAGE_SIZE": 10,  # DEFAULT_PAGE_SIZE 대신 직접 숫자 지정
+    "DEFAULT_PAGINATION_CLASS": "utils.paginations.CustomPagination",
     # 'EXCEPTION_HANDLER': 'devu.exceptions.custom_exception_handler'
 }
 

@@ -4,7 +4,9 @@ from rest_framework.decorators import permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
+from utils.paginations import CustomPagination
 from .models import Project
 from .services import ProjectService
 from .serializers import ProjectRequestSerializer, ProjectResponseSerializer
@@ -17,9 +19,12 @@ class ProjectView(GenericAPIView):
         project_service = ProjectService(user=request.user)
 
         projects = project_service.get_projects()
-        response_serializer = ProjectResponseSerializer(projects, many=True)
 
-        return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+        paginator = CustomPagination()
+        paginated_projects = paginator.paginate_queryset(projects, request)
+
+        response_serializer = ProjectResponseSerializer(paginated_projects, many=True)
+        return Response(data=paginator.get_paginated_response(response_serializer.data), status=status.HTTP_200_OK)
 
     @permission_classes([IsAuthenticated])
     def post(self, request):
