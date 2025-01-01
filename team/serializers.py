@@ -22,8 +22,15 @@ class TeamRequestSerializer(serializers.Serializer):
 class PositionResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     role = serializers.CharField()
+    quota = serializers.IntegerField()
     description = serializers.CharField()
     is_open = serializers.BooleanField()
+
+
+class TeamLeaderResponseSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    email = serializers.EmailField()
+    school = serializers.CharField(source='profile.school')
 
 
 class TeamResponseSerializer(serializers.Serializer):
@@ -33,3 +40,4 @@ class TeamResponseSerializer(serializers.Serializer):
     description = serializers.CharField()
     end_date = serializers.DateField()
     positions = PositionResponseSerializer(many=True)
+    user = TeamLeaderResponseSerializer()

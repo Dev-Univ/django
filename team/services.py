@@ -21,12 +21,21 @@ class TeamService:
             raise Exception(f"Failed to create team: {str(e)}")
 
     @transaction.atomic
-    def get_teams(self):
+    def get_teams(self, type_filter=None):
         try:
-            return Team.objects.prefetch_related(
+            queryset = Team.objects.prefetch_related(
                 'tech_stacks__tech_stack',
                 'positions'
-            ).all()
+            ).select_related(
+                'user',
+                'user__profile'
+            )
+
+            # 타입 필터링
+            if type_filter and type_filter != 'ALL':
+                queryset = queryset.filter(type=type_filter)
+
+            return queryset.order_by('-created_at')
         except Exception as e:
             raise Exception(f"Failed to get teams: {str(e)}")
 

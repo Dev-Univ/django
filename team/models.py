@@ -10,6 +10,8 @@ class Team(models.Model):
     type = models.CharField(choices=Subject.choices, max_length=100)
     description = models.TextField()
     end_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teams')
 
 

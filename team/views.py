@@ -29,13 +29,20 @@ class TeamView(GenericAPIView):
     def get(self, request):
         team_service = TeamService()
 
-        teams = team_service.get_teams()
+        # 요청에서 필터 파라미터만 가져오기
+        type_filter = request.GET.get('filter', 'ALL')
+
+        # 필터 적용하여 teams 가져오기
+        teams = team_service.get_teams(type_filter=type_filter)
 
         paginator = CustomPagination()
         paginated_teams = paginator.paginate_queryset(teams, request)
 
         response_serializer = TeamResponseSerializer(paginated_teams, many=True)
-        return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            data=paginator.get_paginated_response(response_serializer.data),
+            status=status.HTTP_200_OK
+        )
 
 
 class TeamDetailView(GenericAPIView):
