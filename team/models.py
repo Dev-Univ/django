@@ -1,6 +1,7 @@
 from django.db import models
 
 from project.models import TechStack
+from theme.models import Theme
 from user.models import User
 from .choices import Subject
 
@@ -12,6 +13,7 @@ class Team(models.Model):
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    theme = models.ForeignKey(Theme, on_delete=models.SET_NULL, null=True, blank=True, related_name='teams')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teams')
 
 

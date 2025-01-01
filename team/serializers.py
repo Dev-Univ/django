@@ -12,6 +12,7 @@ class PositionRequestSerializer(serializers.Serializer):
 
 class TeamRequestSerializer(serializers.Serializer):
     name = serializers.CharField()
+    theme_id = serializers.IntegerField(allow_null=True, required=False)
     type = serializers.CharField()
     description = serializers.CharField()
     end_date = serializers.DateField()

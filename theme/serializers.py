@@ -10,5 +10,7 @@ class ThemeResponseSerializer(serializers.Serializer):
     year = serializers.IntegerField()
     start_date = serializers.DateField()
     end_date = serializers.DateField()
+    team_count = serializers.IntegerField()
+    total_positions = serializers.IntegerField()
 
     # start_date < end_date validation 필요

@@ -2,6 +2,7 @@ from django.db import transaction
 
 from project.models import TechStack
 from team.models import Team, TeamTechStack, Position
+from theme.models import Theme
 
 
 class TeamService:
@@ -50,11 +51,15 @@ class TeamService:
             raise Exception(f"Failed to get teams by user: {str(e)}")
 
     def _create_proejct_with_validated_data(self, validated_data, user):
+        theme_id = validated_data.pop('theme_id', None)
+        theme = Theme.objects.get(id=theme_id) if theme_id else None
+
         return Team.objects.create(
             name=validated_data['name'],
             type=validated_data['type'],
             description=validated_data['description'],
             end_date=validated_data['end_date'],
+            theme=theme,
             user=user
         )
 
