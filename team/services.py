@@ -70,7 +70,8 @@ class TeamService:
 
         team_positions = [
             Position(
-                name=position['name'],
+                role=position['role'],
+                quota=position['quota'],
                 description=position['description'],
                 is_open=position['is_open'],
                 team=team

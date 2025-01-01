@@ -19,7 +19,8 @@ class TeamTechStack(models.Model):
 
 
 class Position(models.Model):
-    name = models.CharField(max_length=100)
+    role = models.CharField(max_length=100)
+    quota = models.PositiveIntegerField(default=1)
     description = models.TextField()
     is_open = models.BooleanField(default=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='positions')

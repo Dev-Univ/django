@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from team.serializers import TeamRequestSerializer, TeamResponseSerializer
 from team.services import TeamService
+from utils.paginations import CustomPagination
 
 
 class TeamView(GenericAPIView):
@@ -28,10 +29,12 @@ class TeamView(GenericAPIView):
     def get(self, request):
         team_service = TeamService()
 
-        team = team_service.get_teams()
+        teams = team_service.get_teams()
 
-        response_serializer = TeamResponseSerializer(team, many=True)
+        paginator = CustomPagination()
+        paginated_teams = paginator.paginate_queryset(teams, request)
 
+        response_serializer = TeamResponseSerializer(paginated_teams, many=True)
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
 

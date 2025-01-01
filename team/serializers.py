@@ -4,7 +4,8 @@ from rest_framework import serializers
 
 
 class PositionRequestSerializer(serializers.Serializer):
-    name = serializers.CharField()
+    role = serializers.CharField()
+    quota = serializers.IntegerField()
     description = serializers.CharField()
     is_open = serializers.BooleanField()
 
@@ -20,7 +21,7 @@ class TeamRequestSerializer(serializers.Serializer):
 
 class PositionResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    name = serializers.CharField()
+    role = serializers.CharField()
     description = serializers.CharField()
     is_open = serializers.BooleanField()
 
