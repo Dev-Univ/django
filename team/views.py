@@ -47,6 +47,19 @@ class TeamView(GenericAPIView):
 
 class TeamDetailView(GenericAPIView):
 
+    @permission_classes([AllowAny])
+    def get(self, request, team_id):
+        team_service = TeamService()
+
+        team = team_service.get_team_by_team_id(team_id)
+
+        response_serializer = TeamResponseSerializer(team)
+
+        return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+
+
+class TeamListView(GenericAPIView):
+
     @permission_classes([IsAuthenticated])
     def get(self, request):
         team_service = TeamService()

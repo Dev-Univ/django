@@ -22,6 +22,13 @@ class TeamService:
             raise Exception(f"Failed to create team: {str(e)}")
 
     @transaction.atomic
+    def get_team_by_team_id(self, team_id):
+        try:
+            return Team.objects.get(id=team_id)
+        except Team.DoesNotExist:
+            raise Exception(f"Team {team_id} does not exist")
+
+    @transaction.atomic
     def get_teams(self, type_filter=None):
         try:
             queryset = Team.objects.prefetch_related(
