@@ -57,7 +57,10 @@ class TeamService:
         return Team.objects.create(
             name=validated_data['name'],
             type=validated_data['type'],
+            period=validated_data['period'],
+            short_description=validated_data['short_description'],
             description=validated_data['description'],
+            collaboration_method=validated_data['collaboration_method'],
             end_date=validated_data['end_date'],
             theme=theme,
             user=user
@@ -85,7 +88,8 @@ class TeamService:
         team_positions = [
             Position(
                 role=position['role'],
-                quota=position['quota'],
+                max_members=position['max_members'],
+                current_members=position['current_members'],
                 description=position['description'],
                 is_open=position['is_open'],
                 team=team

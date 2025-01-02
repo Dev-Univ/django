@@ -15,6 +15,6 @@ class ThemeService:
 
         theme.team_count = theme.teams.count()
         theme.total_positions = theme.teams.aggregate(
-            total=Sum('positions__quota'))['total'] or 0
+            total=Sum('positions__current_members'))['total'] or 0
 
         return theme
