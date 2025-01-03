@@ -39,6 +39,13 @@ class TeamLeaderResponseSerializer(serializers.Serializer):
     school = serializers.CharField(source='profile.school')
 
 
+class TeamTechStackResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='tech_stack.id')
+    title = serializers.CharField(source='tech_stack.title')
+    category = serializers.CharField(source='tech_stack.category')
+    sub_category = serializers.CharField(source='tech_stack.sub_category')
+
+
 class TeamResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
@@ -50,4 +57,5 @@ class TeamResponseSerializer(serializers.Serializer):
     end_date = serializers.DateField()
     created_at = serializers.DateTimeField()
     positions = PositionResponseSerializer(many=True)
+    tech_stacks = TeamTechStackResponseSerializer(many=True)
     user = TeamLeaderResponseSerializer()

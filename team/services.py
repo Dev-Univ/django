@@ -24,7 +24,10 @@ class TeamService:
     @transaction.atomic
     def get_team_by_team_id(self, team_id):
         try:
-            return Team.objects.get(id=team_id)
+            return Team.objects.prefetch_related(
+                'tech_stacks__tech_stack',
+                'positions'
+            ).get(id=team_id)
         except Team.DoesNotExist:
             raise Exception(f"Team {team_id} does not exist")
 
