@@ -8,12 +8,11 @@ from .choices import Subject
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    # todo: 이거 default 랑 blank 다 삭제해야함
     type = models.CharField(choices=Subject.choices, max_length=100)
-    period = models.CharField(max_length=100, default='', blank=True)
-    short_description = models.TextField(default='', blank=True)
+    period = models.CharField(max_length=100)
+    short_description = models.TextField()
     description = models.TextField()
-    collaboration_method = models.TextField(default='', blank=True)
+    collaboration_method = models.TextField()
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

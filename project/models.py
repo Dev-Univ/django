@@ -48,6 +48,7 @@ class ProjectMember(models.Model):
 
 class TechStack(models.Model):
     title = models.CharField(max_length=100)
+    code = models.CharField(max_length=100)
     category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
     sub_category = models.CharField(max_length=100, choices=TechStackSubCategoryChoices.choices)
 

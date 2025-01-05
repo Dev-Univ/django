@@ -26,7 +26,7 @@ class ProjectRequestSerializer(serializers.Serializer):
     main_image = serializers.ImageField()
     additional_images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=False)
     features = serializers.ListField(child=serializers.CharField())
-    tech_stacks = serializers.ListField(child=serializers.IntegerField())
+    tech_stacks = serializers.ListField(child=serializers.CharField(), allow_empty=True)
     univ = serializers.ListField(child=serializers.IntegerField())
     members = serializers.JSONField()
     time_lines = serializers.JSONField()
@@ -74,6 +74,7 @@ class ProjectFeatureResponseSerializer(serializers.Serializer):
 class ProjectTechStackResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField(source='tech_stack.id')
     title = serializers.CharField(source='tech_stack.title')
+    code = serializers.CharField(source='tech_stack.code')
     category = serializers.CharField(source='tech_stack.category')
     sub_category = serializers.CharField(source='tech_stack.sub_category')
 

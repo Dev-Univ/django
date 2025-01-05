@@ -29,7 +29,7 @@ class ProjectService:
     @transaction.atomic
     def create_project(self, validated_data):
         try:
-            print(validated_data)
+            print(validated_data.get('tech_stacks'))
             project = self._create_project_with_main_image(validated_data)
             self._create_additional_images(project, validated_data.get('additional_images', []))
             self._create_features(project, validated_data.get('features', []))
@@ -102,16 +102,27 @@ class ProjectService:
         if not tech_stacks_data:
             return
 
-        existing_tech_stacks = TechStack.objects.filter(id__in=tech_stacks_data)
+        try:
+            # tech_stacks_data가 리스트인지 확인
+            if not isinstance(tech_stacks_data, list):
+                tech_stacks_data = [tech_stacks_data]
 
-        project_tech_stacks = [
-            ProjectTechStack(
-                project=project,
-                tech_stack=tech_stack
-            ) for tech_stack in existing_tech_stacks
-        ]
+            existing_tech_stacks = TechStack.objects.filter(code__in=tech_stacks_data)
 
-        ProjectTechStack.objects.bulk_create(project_tech_stacks)
+            if not existing_tech_stacks.exists():
+                return  # 또는 에러 처리
+
+            project_tech_stacks = [
+                ProjectTechStack(
+                    project=project,
+                    tech_stack=tech_stack
+                ) for tech_stack in existing_tech_stacks
+            ]
+
+            ProjectTechStack.objects.bulk_create(project_tech_stacks)
+
+        except Exception as e:
+            raise Exception(f"Failed to create tech stacks: {str(e)}")
 
     def _create_univ(self, project, univ_data):
         if not univ_data:
