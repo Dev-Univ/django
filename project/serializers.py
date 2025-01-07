@@ -112,4 +112,11 @@ class ProjectResponseSerializer(serializers.Serializer):
     tech_stacks = ProjectTechStackResponseSerializer(many=True)
     members = ProjectMemberResponseSerializer(many=True)
     time_lines = TimeLineResponseSerializer(many=True)
+    is_owner = serializers.SerializerMethodField()
+
+    def get_is_owner(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return request.user.email == obj.user.email
 

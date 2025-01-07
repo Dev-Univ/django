@@ -52,11 +52,11 @@ class ProjectService:
 
     @transaction.atomic
     def get_project(self, project_id):
-        return Project.objects.prefetch_related(
+        return (Project.objects.prefetch_related(
             'features',
             'tech_stacks__tech_stack',
             'additional_images'
-        ).get(id=project_id)
+        ).select_related('user').get(id=project_id))
 
     @transaction.atomic
     def get_projects(self):
@@ -69,7 +69,7 @@ class ProjectService:
                 'user__profile'
             )),
             'time_lines'
-        ).order_by('-created_at')
+        ).select_related('user').order_by('-created_at')
 
     def _create_project_with_main_image(self, data, user):
         main_image_url = self.upload_image_to_s3(data['main_image'], user, "projects/main")

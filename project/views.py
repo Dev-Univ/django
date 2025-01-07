@@ -47,7 +47,10 @@ class ProjectDetailView(GenericAPIView):
 
         try:
             project = project_service.get_project(project_id)
-            response_serializer = ProjectResponseSerializer(project)
+            response_serializer = ProjectResponseSerializer(
+                project,
+                context={'request': request}
+            )
             return Response(data=response_serializer.data, status=status.HTTP_200_OK)
         except Project.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
