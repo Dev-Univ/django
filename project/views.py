@@ -16,7 +16,7 @@ class ProjectView(GenericAPIView):
 
     @permission_classes([AllowAny])
     def get(self, request):
-        project_service = ProjectService(user=request.user)
+        project_service = ProjectService()
 
         projects = project_service.get_projects()
 
@@ -28,12 +28,12 @@ class ProjectView(GenericAPIView):
 
     @permission_classes([IsAuthenticated])
     def post(self, request):
-        project_service = ProjectService(user=request.user)
+        project_service = ProjectService()
 
         request_serializer = ProjectRequestSerializer(data=request.data)
         request_serializer.is_valid(raise_exception=True)
 
-        project = project_service.create_project(request_serializer.validated_data)
+        project = project_service.create_project(request_serializer.validated_data, request.user)
 
         response_serializer = ProjectResponseSerializer(project)
         return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
@@ -43,7 +43,7 @@ class ProjectDetailView(GenericAPIView):
 
     @permission_classes([AllowAny])
     def get(self, request, project_id):
-        project_service = ProjectService(user=request.user)
+        project_service = ProjectService()
 
         try:
             project = project_service.get_project(project_id)

@@ -17,8 +17,7 @@ User = get_user_model()
 
 
 class ProjectService:
-    def __init__(self, user):
-        self.user = user
+    def __init__(self):
         self.s3_client = boto3.client(
             's3',
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -27,11 +26,10 @@ class ProjectService:
         )
 
     @transaction.atomic
-    def create_project(self, validated_data):
+    def create_project(self, validated_data, user):
         try:
-            print(validated_data.get('tech_stacks'))
-            project = self._create_project_with_main_image(validated_data)
-            self._create_additional_images(project, validated_data.get('additional_images', []))
+            project = self._create_project_with_main_image(validated_data, user)
+            self._create_additional_images(project, validated_data.get('additional_images', []), user)
             self._create_features(project, validated_data.get('features', []))
             self._create_tech_stacks(project, validated_data.get('tech_stacks', []))
             self._create_univ(project, validated_data.get('univ', []))
@@ -73,8 +71,8 @@ class ProjectService:
             'time_lines'
         ).order_by('-created_at')
 
-    def _create_project_with_main_image(self, data):
-        main_image_url = self.upload_image_to_s3(data['main_image'], "projects/main")
+    def _create_project_with_main_image(self, data, user):
+        main_image_url = self.upload_image_to_s3(data['main_image'], user, "projects/main")
         return Project.objects.create(
             title=data['title'],
             start_date=data['start_date'],
@@ -83,7 +81,7 @@ class ProjectService:
             short_description=data['short_description'],
             description=data['description'],
             main_image_url=main_image_url,
-            user=self.user
+            user=user
         )
 
     def _create_features(self, project, features_data):
@@ -139,14 +137,14 @@ class ProjectService:
 
         ProjectUniv.objects.bulk_create(project_univ)
 
-    def _create_additional_images(self, project, images):
+    def _create_additional_images(self, project, images, user):
         if not images:
             return
 
         additional_images = [
             ProjectImage(
                 project=project,
-                image_url=self.upload_image_to_s3(image, "projects/additional")
+                image_url=self.upload_image_to_s3(image, user, "projects/additional")
             ) for image in images
         ]
         ProjectImage.objects.bulk_create(additional_images)
@@ -201,10 +199,10 @@ class ProjectService:
 
         TimeLine.objects.bulk_create(timelines)
 
-    def upload_image_to_s3(self, image, folder: str = "projects") -> str:
+    def upload_image_to_s3(self, image, user, folder: str = "projects") -> str:
         try:
             ext = image.name.split('.')[-1]
-            file_path = f"{folder}/{self.user.id}/{uuid.uuid4()}.{ext}"
+            file_path = f"{folder}/{user.id}/{uuid.uuid4()}.{ext}"
 
             self.s3_client.upload_fileobj(
                 image,
