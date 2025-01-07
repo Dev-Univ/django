@@ -21,7 +21,7 @@ class Project(models.Model):
 
 
 class ProjectUniv(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name='project_univs', on_delete=models.CASCADE)
     univ = models.ForeignKey(Univ, on_delete=models.CASCADE)
 
 

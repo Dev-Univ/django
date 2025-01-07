@@ -97,6 +97,13 @@ class TimeLineResponseSerializer(serializers.Serializer):
     order = serializers.IntegerField()
 
 
+class ProjectUnivResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='univ.id')
+    name = serializers.CharField(source='univ.name')
+    description = serializers.CharField(source='univ.description')
+    region = serializers.CharField(source='univ.region')
+
+
 class ProjectResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     user = ProjectUserResponseSerializer()
@@ -111,6 +118,7 @@ class ProjectResponseSerializer(serializers.Serializer):
     features = ProjectFeatureResponseSerializer(many=True)
     tech_stacks = ProjectTechStackResponseSerializer(many=True)
     members = ProjectMemberResponseSerializer(many=True)
+    project_univs = ProjectUnivResponseSerializer(many=True)
     time_lines = TimeLineResponseSerializer(many=True)
     is_owner = serializers.SerializerMethodField()
 

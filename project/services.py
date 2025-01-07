@@ -55,7 +55,10 @@ class ProjectService:
         return (Project.objects.prefetch_related(
             'features',
             'tech_stacks__tech_stack',
-            'additional_images'
+            'additional_images',
+            'project_univs__univ',
+            'members__user__profile',
+            'time_lines'
         ).select_related('user').get(id=project_id))
 
     @transaction.atomic
@@ -64,9 +67,11 @@ class ProjectService:
             'features',
             'tech_stacks__tech_stack',
             'additional_images',
+            'project_univs__univ',
             Prefetch('members', queryset=ProjectMember.objects.select_related(
                 'user',
-                'user__profile'
+                'user__profile',
+                'project_univs__univ'
             )),
             'time_lines'
         ).select_related('user').order_by('-created_at')
