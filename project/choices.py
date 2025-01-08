@@ -1,6 +1,11 @@
 from django.db.models import TextChoices
 
 
+class ProjectSaveForm(TextChoices):
+    BASIC_FORM = 'BASIC_FORM', '기본 폼'
+    README_FORM = 'README_FORM', '리드미 폼'
+
+
 class ProjectMemberRole(TextChoices):
     # 첫번째가 실제 저장 값, 두번째가 label
     LEADER = "LEADER", "팀장"

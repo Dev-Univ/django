@@ -70,8 +70,7 @@ class ProjectService:
             'project_univs__univ',
             Prefetch('members', queryset=ProjectMember.objects.select_related(
                 'user',
-                'user__profile',
-                'project_univs__univ'
+                'user__profile'
             )),
             'time_lines'
         ).select_related('user').order_by('-created_at')
@@ -80,11 +79,13 @@ class ProjectService:
         main_image_url = self.upload_image_to_s3(data['main_image'], user, "projects/main")
         return Project.objects.create(
             title=data['title'],
+            form_mode=data['form_mode'],
             start_date=data['start_date'],
             end_date=data['end_date'],
             status=data['status'],
             short_description=data['short_description'],
             description=data['description'],
+            read_me_content=data['read_me_content'],
             main_image_url=main_image_url,
             user=user
         )

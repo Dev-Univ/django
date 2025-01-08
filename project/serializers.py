@@ -18,6 +18,7 @@ class TimeLineRequestSerializer(serializers.Serializer):
 
 class ProjectRequestSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100)
+    form_mode = serializers.CharField(default='BASIC_FORM')
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     status = serializers.CharField(max_length=100)
@@ -30,6 +31,7 @@ class ProjectRequestSerializer(serializers.Serializer):
     univ = serializers.ListField(child=serializers.IntegerField())
     members = serializers.JSONField()
     time_lines = serializers.JSONField()
+    read_me_content = serializers.CharField()
 
     # 어쩔 수 없이 JSON 문자열을 파싱하고 TimeLineRequestSerializer로 검증
     # todo: 어떻게든 이거 바꾸고싶은데..
@@ -108,6 +110,7 @@ class ProjectResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     user = ProjectUserResponseSerializer()
     title = serializers.CharField(max_length=100)
+    form_mode = serializers.CharField()
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     status = serializers.CharField(max_length=100)
@@ -121,6 +124,7 @@ class ProjectResponseSerializer(serializers.Serializer):
     project_univs = ProjectUnivResponseSerializer(many=True)
     time_lines = TimeLineResponseSerializer(many=True)
     is_owner = serializers.SerializerMethodField()
+    read_me_content = serializers.CharField()
 
     def get_is_owner(self, obj):
         request = self.context.get('request')

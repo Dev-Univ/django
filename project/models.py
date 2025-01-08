@@ -3,17 +3,20 @@ from django.utils import timezone
 
 from univ.models import Univ
 from user.models import User
-from .choices import ProjectMemberRole, TechStackCategoryChoices, TechStackSubCategoryChoices, ProjectStatus
+from .choices import ProjectMemberRole, TechStackCategoryChoices, TechStackSubCategoryChoices, ProjectStatus, \
+    ProjectSaveForm
 
 
 class Project(models.Model):
     title = models.CharField(max_length=100)
+    form_mode = models.CharField(choices=ProjectSaveForm.choices, max_length=100, default=ProjectSaveForm.BASIC_FORM)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     status = models.CharField(choices=ProjectStatus.choices, max_length=100, default=ProjectStatus.COMPLETED)
     short_description = models.TextField()
     description = models.TextField()
     main_image_url = models.CharField(max_length=500, null=True, blank=True)
+    read_me_content = models.TextField(null=True, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # 이거는 프로젝트 생성 유저
