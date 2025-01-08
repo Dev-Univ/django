@@ -31,7 +31,7 @@ class ProjectRequestSerializer(serializers.Serializer):
     univ = serializers.ListField(child=serializers.IntegerField())
     members = serializers.JSONField()
     time_lines = serializers.JSONField()
-    read_me_content = serializers.CharField()
+    read_me_content = serializers.CharField(allow_null=True, allow_blank=True, required=False, default='')
 
     # 어쩔 수 없이 JSON 문자열을 파싱하고 TimeLineRequestSerializer로 검증
     # todo: 어떻게든 이거 바꾸고싶은데..

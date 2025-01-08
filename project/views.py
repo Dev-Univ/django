@@ -54,3 +54,16 @@ class ProjectDetailView(GenericAPIView):
             return Response(data=response_serializer.data, status=status.HTTP_200_OK)
         except Project.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @permission_classes([IsAuthenticated])
+    def put(self, request, project_id):
+        project_service = ProjectService()
+
+        request_serializer = ProjectRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
+
+        project = project_service.update_project(project_id, request_serializer.validated_data, request.user)
+
+        response_serializer = ProjectResponseSerializer(project)
+        return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+

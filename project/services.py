@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import boto3
@@ -74,6 +75,119 @@ class ProjectService:
             )),
             'time_lines'
         ).select_related('user').order_by('-created_at')
+
+    @transaction.atomic
+    def update_project(self, project_id, validated_data, user):
+        try:
+            project = Project.objects.get(id=project_id)
+
+            if project.user != user:
+                raise Exception("Permission denied: You are not the owner of this project")
+
+            # 메인 이미지와 기본 필드들 한번에 업데이트
+            update_fields = []
+            if 'main_image' in validated_data:
+                project.main_image_url = self.upload_image_to_s3(validated_data['main_image'], user, "projects/main")
+                update_fields.append('main_image_url')
+
+            basic_fields = [
+                'title', 'form_mode', 'start_date', 'end_date', 'status',
+                'short_description', 'description', 'read_me_content'
+            ]
+            for field in basic_fields:
+                if field in validated_data:
+                    setattr(project, field, validated_data[field])
+                    update_fields.append(field)
+
+            if update_fields:
+                project.save(update_fields=update_fields)
+
+            # 각 related 필드들은 bulk operation으로 한번에 처리
+            if 'additional_images' in validated_data:
+                ProjectImage.objects.filter(project=project).delete()
+                if validated_data['additional_images']:
+                    ProjectImage.objects.bulk_create([
+                        ProjectImage(
+                            project=project,
+                            image_url=self.upload_image_to_s3(image, user, "projects/additional")
+                        ) for image in validated_data['additional_images']
+                    ])
+
+            if 'features' in validated_data:
+                ProjectFeature.objects.filter(project=project).delete()
+                if validated_data['features']:
+                    ProjectFeature.objects.bulk_create([
+                        ProjectFeature(project=project, description=feature)
+                        for feature in validated_data['features']
+                    ])
+
+            if 'tech_stacks' in validated_data:
+                ProjectTechStack.objects.filter(project=project).delete()
+                if validated_data['tech_stacks']:
+                    tech_stacks = TechStack.objects.filter(code__in=validated_data['tech_stacks'])
+                    ProjectTechStack.objects.bulk_create([
+                        ProjectTechStack(project=project, tech_stack=tech_stack)
+                        for tech_stack in tech_stacks
+                    ])
+
+            if 'univ' in validated_data:
+                ProjectUniv.objects.filter(project=project).delete()
+                if validated_data['univ']:
+                    ProjectUniv.objects.bulk_create([
+                        ProjectUniv(project=project, univ_id=univ_id)
+                        for univ_id in validated_data['univ']
+                    ])
+
+            if 'members' in validated_data:
+                members_data = (
+                    json.loads(validated_data['members'])
+                    if isinstance(validated_data['members'], str)
+                    else validated_data['members']
+                )
+                if members_data:
+                    ProjectMember.objects.filter(project=project).delete()
+                    emails = [member['user_email'] for member in members_data]
+                    users = {
+                        user.email: user
+                        for user in User.objects.filter(email__in=emails)
+                    }
+                    ProjectMember.objects.bulk_create([
+                        ProjectMember(
+                            project=project,
+                            user=users[member['user_email']],
+                            role=member['role'],
+                            description=member.get('description', '')
+                        ) for member in members_data
+                        if member['user_email'] in users
+                    ])
+
+            if 'time_lines' in validated_data:
+                TimeLine.objects.filter(project=project).delete()
+                if validated_data['time_lines']:
+                    TimeLine.objects.bulk_create([
+                        TimeLine(
+                            project=project,
+                            date=timeline['date'],
+                            title=timeline['title'],
+                            description=timeline['description'],
+                            order=timeline['order']
+                        ) for timeline in validated_data['time_lines']
+                    ])
+
+            return Project.objects.prefetch_related(
+                'features',
+                'tech_stacks__tech_stack',
+                'additional_images',
+                'members',
+                'members__user',
+                'members__user__profile',
+                'time_lines'
+            ).get(id=project.id)
+
+        except Project.DoesNotExist:
+            raise Exception("Project not found")
+        except Exception as e:
+            raise Exception(f"Failed to update project: {str(e)}")
 
     def _create_project_with_main_image(self, data, user):
         main_image_url = self.upload_image_to_s3(data['main_image'], user, "projects/main")
