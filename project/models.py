@@ -10,17 +10,20 @@ from .choices import ProjectMemberRole, TechStackCategoryChoices, TechStackSubCa
 class Project(models.Model):
     title = models.CharField(max_length=100)
     form_mode = models.CharField(choices=ProjectSaveForm.choices, max_length=100, default=ProjectSaveForm.BASIC_FORM)
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
     status = models.CharField(choices=ProjectStatus.choices, max_length=100, default=ProjectStatus.COMPLETED)
     short_description = models.TextField()
     description = models.TextField()
-    main_image_url = models.CharField(max_length=500, null=True, blank=True)
-    read_me_content = models.TextField(null=True, blank=True, default='')
+    main_image_url = models.CharField(max_length=500, blank=True)
+    read_me_content = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # 이거는 프로젝트 생성 유저
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
 
 
 class ProjectUniv(models.Model):
@@ -34,19 +37,28 @@ class ProjectFeature(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     project = models.ForeignKey(Project, related_name='features', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.project.title} - description: {self.description}'
+
 
 class ProjectImage(models.Model):
     image_url = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     project = models.ForeignKey(Project, related_name='additional_images', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.project.title} - image'
+
 
 class ProjectMember(models.Model):
     role = models.CharField(max_length=100, choices=ProjectMemberRole.choices, default=ProjectMemberRole.MEMBER)
-    description = models.TextField(default='추후에 설명을 입력해주세요.')
+    description = models.TextField()
     joined_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members')
+
+    def __str__(self):
+        return f'{self.project.title} - members'
 
 
 class TechStack(models.Model):
@@ -54,6 +66,9 @@ class TechStack(models.Model):
     code = models.CharField(max_length=100)
     category = models.CharField(max_length=100, choices=TechStackCategoryChoices.choices)
     sub_category = models.CharField(max_length=100, choices=TechStackSubCategoryChoices.choices)
+
+    def __str__(self):
+        return self.title
 
 
 class ProjectTechStack(models.Model):
@@ -67,8 +82,11 @@ class UserTechStack(models.Model):
 
 
 class TimeLine(models.Model):
-    date = models.DateField(default=timezone.now)
+    date = models.DateField()
     title = models.CharField(max_length=100)
     description = models.TextField()
     order = models.IntegerField(default=1)
     project = models.ForeignKey(Project, related_name='time_lines', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.project.title} - timeline'

@@ -29,6 +29,7 @@ class ProjectService:
     @transaction.atomic
     def create_project(self, validated_data, user):
         try:
+            print(validated_data)
             project = self._create_project_with_main_image(validated_data, user)
             self._create_additional_images(project, validated_data.get('additional_images', []), user)
             self._create_features(project, validated_data.get('features', []))
@@ -190,16 +191,20 @@ class ProjectService:
             raise Exception(f"Failed to update project: {str(e)}")
 
     def _create_project_with_main_image(self, data, user):
-        main_image_url = self.upload_image_to_s3(data['main_image'], user, "projects/main")
+        main_image_url = (
+            self.upload_image_to_s3(data['main_image'], user, "projects/main")
+            if data.get('main_image')
+            else ''
+        )
         return Project.objects.create(
             title=data['title'],
             form_mode=data['form_mode'],
-            start_date=data['start_date'],
-            end_date=data['end_date'],
+            start_date=data.get('start_date', None),
+            end_date=data.get('end_date', None),
             status=data['status'],
             short_description=data['short_description'],
             description=data['description'],
-            read_me_content=data['read_me_content'],
+            read_me_content=data.get('read_me_content', ''),
             main_image_url=main_image_url,
             user=user
         )
