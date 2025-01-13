@@ -61,6 +61,7 @@ class ProjectRequestSerializer(serializers.Serializer):
 class ProjectUserResponseSerializer(serializers.Serializer):
     name = serializers.CharField()
     email = serializers.EmailField()
+    profile_image_url = serializers.CharField()
 
 
 class ProjectImageResponseSerializer(serializers.Serializer):
@@ -131,4 +132,3 @@ class ProjectResponseSerializer(serializers.Serializer):
         if not request or not request.user.is_authenticated:
             return False
         return request.user.email == obj.user.email
-

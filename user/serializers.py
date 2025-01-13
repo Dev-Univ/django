@@ -13,6 +13,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class UserResponseSerializer(serializers.Serializer):
     email = serializers.EmailField()
     name = serializers.CharField()
+    profile_image_url = serializers.CharField()
     school = serializers.CharField(source='user_profile.school')
     major = serializers.CharField(source='user_profile.major')
 
@@ -47,6 +48,7 @@ class UserProfileTechStackResponseSerializer(serializers.Serializer):
 class PublicUserProfileResponseSerializer(serializers.Serializer):
     email = serializers.EmailField()
     name = serializers.CharField()
+    profile_image_url = serializers.CharField()
     school_email_verified = serializers.BooleanField()
     school = serializers.CharField(max_length=100, source='profile.school')
     major = serializers.CharField(max_length=100, source='profile.major')
@@ -58,6 +60,7 @@ class PublicUserProfileResponseSerializer(serializers.Serializer):
 class PrivateUserProfileResponseSerializer(serializers.Serializer):
     email = serializers.EmailField()
     name = serializers.CharField()
+    profile_image_url = serializers.CharField()
     school_email_verified = serializers.BooleanField()
     school = serializers.CharField(max_length=100, source='profile.school')
     major = serializers.CharField(max_length=100, source='profile.major')
