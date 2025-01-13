@@ -29,7 +29,6 @@ class ProjectService:
     @transaction.atomic
     def create_project(self, validated_data, user):
         try:
-            print(validated_data)
             project = self._create_project_with_main_image(validated_data, user)
             self._create_additional_images(project, validated_data.get('additional_images', []), user)
             self._create_features(project, validated_data.get('features', []))

@@ -1,6 +1,5 @@
 from django.conf import settings
 import requests
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.decorators import permission_classes
@@ -13,6 +12,7 @@ from django.contrib.auth import get_user_model
 from .serializers import UserProfileRequestSerializer, UserSerializer, \
     PrivateUserProfileResponseSerializer, PublicUserProfileResponseSerializer
 from .services import UserService
+from urllib.parse import urlencode
 
 User = get_user_model()
 
@@ -58,8 +58,15 @@ class KakaoLoginView(APIView):
         client_id = settings.KAKAO_CONFIG['KAKAO_REST_API_KEY']
         redirect_uri = settings.KAKAO_CONFIG['KAKAO_REDIRECT_URI']
 
-        kakao_auth_url = f"https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
+        params = {
+            'client_id': client_id,
+            'redirect_uri': redirect_uri,
+            'response_type': 'code',
+            'scope': 'profile_nickname account_email profile_image',
+            'prompt': 'select_account',
+        }
 
+        kakao_auth_url = f"https://kauth.kakao.com/oauth/authorize?{urlencode(params)}"
         return Response({'auth_url': kakao_auth_url})
 
 
@@ -83,7 +90,7 @@ class KakaoCallbackView(APIView):
         if not user_info:
             return Response({'error': 'Failed to get user info'},
                             status=status.HTTP_400_BAD_REQUEST)
-
+        print(user_info)
         # 사용자 생성 또는 로그인 처리
         user = self.get_or_create_user(user_info)
 
@@ -143,13 +150,15 @@ class KakaoCallbackView(APIView):
             user = User.objects.get(email=email)
             # 기존 사용자의 카카오 정보 업데이트
             user.kakao_id = str(user_info.get('id'))
+            user.profile_image_url = str(kakao_account.get('profile', {}).get('thumbnail_image_url', ''))
             user.save()
         except User.DoesNotExist:
             # 새로운 사용자 생성
             user = User.objects.create_user(
                 email=email,
                 name=kakao_account.get('profile', {}).get('nickname', ''),
-                kakao_id=str(user_info.get('id'))
+                kakao_id=str(user_info.get('id')),
+                profile_image_url=kakao_account.get('profile', {}).get('thumbnail_image_url', ''),
             )
 
         return user

@@ -24,6 +24,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    profile_image_url = models.TextField(blank=True, null=True)
 
     # 인증 관련
     kakao_id = models.CharField(max_length=100, null=True, blank=True)
