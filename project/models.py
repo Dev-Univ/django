@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 from univ.models import Univ
 from user.models import User
@@ -9,14 +8,14 @@ from .choices import ProjectMemberRole, TechStackCategoryChoices, TechStackSubCa
 
 class Project(models.Model):
     title = models.CharField(max_length=100)
-    form_mode = models.CharField(choices=ProjectSaveForm.choices, max_length=100, default=ProjectSaveForm.BASIC_FORM)
+    form_mode = models.CharField(choices=ProjectSaveForm.choices, max_length=50, default=ProjectSaveForm.BASIC_FORM)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
-    status = models.CharField(choices=ProjectStatus.choices, max_length=100, default=ProjectStatus.COMPLETED)
-    short_description = models.TextField()
-    description = models.TextField()
+    status = models.CharField(choices=ProjectStatus.choices, max_length=50, default=ProjectStatus.COMPLETED)
+    short_description = models.CharField(max_length=100)
+    description = models.TextField(max_length=20000)
     main_image_url = models.CharField(max_length=500, blank=True)
-    read_me_content = models.TextField(blank=True, default='')
+    read_me_content = models.TextField(blank=True, default='', max_length=25000)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # 이거는 프로젝트 생성 유저
@@ -32,7 +31,7 @@ class ProjectUniv(models.Model):
 
 
 class ProjectFeature(models.Model):
-    description = models.TextField()
+    description = models.TextField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     project = models.ForeignKey(Project, related_name='features', on_delete=models.CASCADE)
@@ -51,8 +50,8 @@ class ProjectImage(models.Model):
 
 
 class ProjectMember(models.Model):
-    role = models.CharField(max_length=100, choices=ProjectMemberRole.choices, default=ProjectMemberRole.MEMBER)
-    description = models.TextField()
+    role = models.CharField(max_length=50, choices=ProjectMemberRole.choices, default=ProjectMemberRole.MEMBER)
+    description = models.TextField(max_length=100)
     joined_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members')
@@ -84,7 +83,7 @@ class UserTechStack(models.Model):
 class TimeLine(models.Model):
     date = models.DateField()
     title = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(max_length=2000)
     order = models.IntegerField(default=1)
     project = models.ForeignKey(Project, related_name='time_lines', on_delete=models.CASCADE)
 

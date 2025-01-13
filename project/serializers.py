@@ -4,34 +4,34 @@ from rest_framework import serializers
 
 
 class ProjectMemberRequestSerializer(serializers.Serializer):
-    role = serializers.CharField(required=False)
+    role = serializers.CharField(required=False, max_length=50)
     user_email = serializers.EmailField()
-    description = serializers.CharField(required=False)
+    description = serializers.CharField(required=False, max_length=100)
 
 
 class TimeLineRequestSerializer(serializers.Serializer):
     date = serializers.DateField(required=False)
     title = serializers.CharField(max_length=100)
-    description = serializers.CharField()
+    description = serializers.CharField(max_length=2000)
     order = serializers.IntegerField()
 
 
 class ProjectRequestSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100)
-    form_mode = serializers.CharField()
+    form_mode = serializers.CharField(max_length=50)
     start_date = serializers.DateField(required=False)
     end_date = serializers.DateField(required=False)
-    status = serializers.CharField(max_length=100)
-    short_description = serializers.CharField()
-    description = serializers.CharField()
+    status = serializers.CharField(max_length=50)
+    short_description = serializers.CharField(max_length=100)
+    description = serializers.CharField(max_length=20000)
     main_image = serializers.ImageField(required=False)
     additional_images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=False)
-    features = serializers.ListField(child=serializers.CharField(), required=False)
+    features = serializers.ListField(child=serializers.CharField(max_length=1000), required=False)
     tech_stacks = serializers.ListField(child=serializers.CharField(), required=False)
     univ = serializers.ListField(child=serializers.IntegerField(), required=False)
     members = serializers.JSONField()
     time_lines = serializers.JSONField(required=False)
-    read_me_content = serializers.CharField(required=False)
+    read_me_content = serializers.CharField(required=False, max_length=25000)
 
     # 어쩔 수 없이 JSON 문자열을 파싱하고 TimeLineRequestSerializer로 검증
     # todo: 어떻게든 이거 바꾸고싶은데..
