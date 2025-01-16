@@ -132,3 +132,13 @@ class ProjectResponseSerializer(serializers.Serializer):
         if not request or not request.user.is_authenticated:
             return False
         return request.user.email == obj.user.email
+
+
+class ProjectListSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    user = ProjectUserResponseSerializer()
+    title = serializers.CharField(max_length=100)
+    short_description = serializers.CharField()
+    description = serializers.CharField()
+    main_image_url = serializers.CharField(max_length=255)
+    tech_stacks = ProjectTechStackResponseSerializer(many=True)

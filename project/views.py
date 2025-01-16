@@ -9,7 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 from utils.paginations import CustomPagination
 from .models import Project
 from .services import ProjectService
-from .serializers import ProjectRequestSerializer, ProjectResponseSerializer
+from .serializers import ProjectRequestSerializer, ProjectResponseSerializer, ProjectListSerializer
 
 
 class ProjectView(GenericAPIView):
@@ -23,7 +23,7 @@ class ProjectView(GenericAPIView):
         paginator = CustomPagination()
         paginated_projects = paginator.paginate_queryset(projects, request)
 
-        response_serializer = ProjectResponseSerializer(paginated_projects, many=True)
+        response_serializer = ProjectListSerializer(paginated_projects, many=True)
         return Response(data=paginator.get_paginated_response(response_serializer.data), status=status.HTTP_200_OK)
 
     @permission_classes([IsAuthenticated])
@@ -67,3 +67,14 @@ class ProjectDetailView(GenericAPIView):
         response_serializer = ProjectResponseSerializer(project)
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
+
+class ProjectListView(GenericAPIView):
+
+    @permission_classes([AllowAny])
+    def get(self, request, user_email):
+        project_service = ProjectService()
+
+        projects = project_service.get_projects_by_user_email(user_email)
+
+        response_serializer = ProjectListSerializer(projects, many=True)
+        return Response(data=response_serializer.data, status=status.HTTP_200_OK)

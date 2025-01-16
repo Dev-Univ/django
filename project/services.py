@@ -65,15 +65,7 @@ class ProjectService:
     @transaction.atomic
     def get_projects(self):
         return Project.objects.prefetch_related(
-            'features',
             'tech_stacks__tech_stack',
-            'additional_images',
-            'project_univs__univ',
-            Prefetch('members', queryset=ProjectMember.objects.select_related(
-                'user',
-                'user__profile'
-            )),
-            'time_lines'
         ).select_related('user').order_by('-created_at')
 
     @transaction.atomic
@@ -188,6 +180,12 @@ class ProjectService:
             raise Exception("Project not found")
         except Exception as e:
             raise Exception(f"Failed to update project: {str(e)}")
+
+    @transaction.atomic
+    def get_projects_by_user_email(self, user_email):
+        return Project.objects.filter(user__email=user_email).prefetch_related(
+            'tech_stacks__tech_stack',
+        ).select_related('user')
 
     def _create_project_with_main_image(self, data, user):
         main_image_url = (
