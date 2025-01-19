@@ -88,6 +88,7 @@ class ProjectMemberResponseSerializer(serializers.Serializer):
     school = serializers.CharField(source='user.profile.school')
     self_introduction = serializers.CharField(source='user.profile.self_introduction')
     github_url = serializers.CharField(source='user.profile.github_url')
+    profile_image_url = serializers.CharField(source='user.profile_image_url')
     description = serializers.CharField()
     role = serializers.CharField()
 
