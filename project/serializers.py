@@ -57,6 +57,22 @@ class ProjectRequestSerializer(serializers.Serializer):
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
+    def validate_main_image(self, value):
+        if value:
+            if value.size > 5 * 1024 * 1024:
+                raise serializers.ValidationError(
+                    f"메인 이미지 크기는 5MB를 초과할 수 없습니다."
+                )
+        return value
+
+    def validate_additional_images(self, value):
+        if value:
+            for idx, image in enumerate(value):
+                if image.size > 5 * 1024 * 1024:
+                    raise serializers.ValidationError(
+                        f"{idx + 1}번째 추가 이미지가 5MB를 초과합니다."
+                    )
+        return value
 
 class ProjectUserResponseSerializer(serializers.Serializer):
     name = serializers.CharField()
