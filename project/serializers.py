@@ -28,7 +28,7 @@ class ProjectRequestSerializer(serializers.Serializer):
     additional_images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=False)
     features = serializers.ListField(child=serializers.CharField(max_length=1000), required=False)
     tech_stacks = serializers.ListField(child=serializers.CharField(), required=False)
-    univ = serializers.ListField(child=serializers.IntegerField(), required=False)
+    univ = serializers.ListField(child=serializers.CharField(), required=False)
     members = serializers.JSONField()
     time_lines = serializers.JSONField(required=False)
     read_me_content = serializers.CharField(required=False, max_length=25000)

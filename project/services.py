@@ -248,7 +248,7 @@ class ProjectService:
         if not univ_data:
             return
 
-        existing_univ = Univ.objects.filter(id__in=univ_data)
+        existing_univ = Univ.objects.filter(code__in=univ_data)
 
         project_univ = [
             ProjectUniv(
