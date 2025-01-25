@@ -17,14 +17,17 @@ class ProjectView(GenericAPIView):
     @permission_classes([AllowAny])
     def get(self, request):
         project_service = ProjectService()
+        search_query = request.query_params.get('search', '')
 
-        projects = project_service.get_projects()
-
+        projects = project_service.get_projects(search_query)
         paginator = CustomPagination()
         paginated_projects = paginator.paginate_queryset(projects, request)
 
         response_serializer = ProjectListSerializer(paginated_projects, many=True)
-        return Response(data=paginator.get_paginated_response(response_serializer.data), status=status.HTTP_200_OK)
+        return Response(
+            data=paginator.get_paginated_response(response_serializer.data),
+            status=status.HTTP_200_OK
+        )
 
     @permission_classes([IsAuthenticated])
     def post(self, request):

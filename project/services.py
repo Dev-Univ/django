@@ -5,7 +5,6 @@ import boto3
 from botocore.exceptions import ClientError
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.db.models import Prefetch
 
 import univ
 from devu import settings
@@ -13,6 +12,8 @@ from project.models import ProjectImage, Project, ProjectFeature, TechStack, Pro
     ProjectUniv
 from univ.models import Univ
 from .choices import ProjectMemberRole
+
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -63,10 +64,19 @@ class ProjectService:
         ).select_related('user').get(id=project_id))
 
     @transaction.atomic
-    def get_projects(self):
-        return Project.objects.prefetch_related(
+    def get_projects(self, search_query=None):
+        queryset = Project.objects.prefetch_related(
             'tech_stacks__tech_stack',
-        ).select_related('user').order_by('-created_at')
+        ).select_related('user')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(short_description__icontains=search_query) |
+                Q(tech_stacks__tech_stack__title__icontains=search_query)
+            ).distinct()
+
+        return queryset.order_by('-created_at')
 
     @transaction.atomic
     def update_project(self, project_id, validated_data, user):
