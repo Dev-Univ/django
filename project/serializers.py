@@ -74,6 +74,7 @@ class ProjectRequestSerializer(serializers.Serializer):
                     )
         return value
 
+
 class ProjectUserResponseSerializer(serializers.Serializer):
     name = serializers.CharField()
     email = serializers.EmailField()
@@ -143,6 +144,7 @@ class ProjectResponseSerializer(serializers.Serializer):
     time_lines = TimeLineResponseSerializer(many=True)
     is_owner = serializers.SerializerMethodField()
     read_me_content = serializers.CharField()
+    created_at = serializers.DateTimeField()
 
     def get_is_owner(self, obj):
         request = self.context.get('request')
@@ -159,3 +161,4 @@ class ProjectListSerializer(serializers.Serializer):
     description = serializers.CharField()
     main_image_url = serializers.CharField(max_length=255)
     tech_stacks = ProjectTechStackResponseSerializer(many=True)
+    created_at = serializers.DateTimeField()
