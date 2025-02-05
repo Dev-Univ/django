@@ -135,9 +135,10 @@ class ProjectService:
             if 'univ' in validated_data:
                 ProjectUniv.objects.filter(project=project).delete()
                 if validated_data['univ']:
+                    univs = Univ.objects.filter(code__in=validated_data['univ'])
                     ProjectUniv.objects.bulk_create([
-                        ProjectUniv(project=project, univ_id=univ_id)
-                        for univ_id in validated_data['univ']
+                        ProjectUniv(project=project, univ=univ)
+                        for univ in univs
                     ])
 
             if 'members' in validated_data:

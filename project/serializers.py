@@ -121,6 +121,7 @@ class TimeLineResponseSerializer(serializers.Serializer):
 class ProjectUnivResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField(source='univ.id')
     name = serializers.CharField(source='univ.name')
+    code = serializers.CharField(source='univ.code')
     description = serializers.CharField(source='univ.description')
     region = serializers.CharField(source='univ.region')
 

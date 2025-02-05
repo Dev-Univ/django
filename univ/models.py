@@ -10,4 +10,7 @@ class Univ(models.Model):
     description = models.TextField(max_length=500)
     region = models.CharField(max_length=100, choices=Region.choices)
 
+    def __str__(self):
+        return self.name
+
     # todo: 학생, 프로젝트, 공지사항 fk로 연결
