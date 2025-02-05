@@ -15,3 +15,6 @@ class Notice(models.Model):
     is_pinned = models.BooleanField(default=False)  # 상단 고정 여부
     is_active = models.BooleanField(default=True)  # 공개/비공개 여부
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
