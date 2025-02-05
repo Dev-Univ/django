@@ -1,3 +1,5 @@
+import uuid
+
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -28,7 +30,7 @@ class UserProfileRequestSerializer(serializers.Serializer):
     self_introduction = serializers.CharField(max_length=1000)
     github_url = serializers.CharField(max_length=255, required=False, allow_blank=True)
     is_profile_private = serializers.BooleanField(default=False)
-    tech_stacks = serializers.ListField(child=serializers.IntegerField(required=False))
+    tech_stacks = serializers.ListField(child=serializers.CharField(required=False))
 
 
 class UserSerializer(serializers.Serializer):
@@ -41,6 +43,7 @@ class UserSerializer(serializers.Serializer):
 
 class UserProfileTechStackResponseSerializer(serializers.Serializer):
     title = serializers.CharField(source='tech_stack.title')
+    code = serializers.CharField(source='tech_stack.code')
     category = serializers.CharField(source='tech_stack.category')
     sub_category = serializers.CharField(source='tech_stack.sub_category')
 

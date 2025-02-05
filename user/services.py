@@ -16,7 +16,7 @@ class UserService:
 
     @transaction.atomic
     def update_user_profile(self, profile_data, user):
-        tech_stack_ids = profile_data.pop('tech_stacks', [])
+        tech_stack_codes = profile_data.pop('tech_stacks', [])
 
         # 유저 프로필이 있으면 가져오고 없으면 생성
         profile, created = UserProfile.objects.get_or_create(user=user)
@@ -35,9 +35,9 @@ class UserService:
 
         # 새로운 tech stack 관계 생성
         tech_stacks_to_create = []
-        for tech_stack_id in tech_stack_ids:
+        for tech_stack_code in tech_stack_codes:
             try:
-                tech_stack = TechStack.objects.get(id=tech_stack_id)
+                tech_stack = TechStack.objects.get(code=tech_stack_code)
                 tech_stacks_to_create.append(
                     UserTechStack(user=user, tech_stack=tech_stack)
                 )
