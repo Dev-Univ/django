@@ -196,7 +196,7 @@ class ProjectService:
     def get_projects_by_user_email(self, user_email):
         return Project.objects.filter(user__email=user_email).prefetch_related(
             'tech_stacks__tech_stack',
-        ).select_related('user')
+        ).select_related('user').order_by('-created_at')
 
     def _create_project_with_main_image(self, data, user):
         main_image_url = (
