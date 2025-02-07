@@ -30,9 +30,8 @@ class UnivService:
             id__in=ProjectUniv.objects.values('univ_id').distinct()
         ).annotate(
             student_count=Count(
-                UserProfile.objects.filter(
-                    school=F('school')
-                ).values('id'),
+                'id',
+                filter=Q(code__in=UserProfile.objects.values('school')),
                 distinct=True
             ),
             project_count=Count(
