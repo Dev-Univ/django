@@ -71,6 +71,7 @@ class ProjectDetailView(GenericAPIView):
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
 
+# todo: 나중에 쿼리 파라미터로 통합하기
 class ProjectListView(GenericAPIView):
 
     @permission_classes([AllowAny])
@@ -78,6 +79,18 @@ class ProjectListView(GenericAPIView):
         project_service = ProjectService()
 
         projects = project_service.get_projects_by_user_email(user_email)
+
+        response_serializer = ProjectListSerializer(projects, many=True)
+        return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+
+
+class UnivProjectListView(GenericAPIView):
+
+    @permission_classes([AllowAny])
+    def get(self, request, univ_code):
+        project_service = ProjectService()
+
+        projects = project_service.get_projects_by_univ_code(univ_code)
 
         response_serializer = ProjectListSerializer(projects, many=True)
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)

@@ -227,6 +227,14 @@ class ProjectService:
             'tech_stacks__tech_stack',
         ).select_related('user').order_by('-created_at')
 
+    @transaction.atomic
+    def get_projects_by_univ_code(self, univ_code):
+        return Project.objects.filter(
+            project_univs__univ__code=univ_code
+            ).prefetch_related(
+            'tech_stacks__tech_stack',
+        ).select_related('user').order_by('-created_at')[:4]
+
     def _create_project_with_main_image(self, data, user):
         main_image_url = (
             self.upload_image_to_s3(data['main_image'], user, "projects/main")
@@ -316,7 +324,6 @@ class ProjectService:
             return
 
         try:
-            print(members_data)
             # members_data가 이미 dict 리스트인지 확인
             if isinstance(members_data, str):
                 import json
