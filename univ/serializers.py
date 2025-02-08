@@ -18,3 +18,24 @@ class UnivInfoResponseSerializer(serializers.Serializer):
 
     total_info = TotalStatsSerializer()
     universities = UnivResponseSerializer(many=True)
+
+
+class UnivRankingDetailSerializer(serializers.Serializer):
+    project_count = serializers.IntegerField()
+    completed_ratio = serializers.FloatField()
+    avg_features = serializers.FloatField()
+    avg_tech_stacks = serializers.FloatField()
+
+
+class UnivRankingSerializer(serializers.Serializer):
+    rank = serializers.IntegerField()
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    region = serializers.CharField()
+    total_score = serializers.FloatField()
+    details = UnivRankingDetailSerializer()
+
+
+class UnivRankingResponseSerializer(serializers.Serializer):
+    rankings = UnivRankingSerializer(many=True)
+    total_count = serializers.IntegerField()

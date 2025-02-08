@@ -1,6 +1,6 @@
 from django.urls import path
 
-from univ.views import UnivView, UnivDetailView, UnivInfoView
+from univ.views import UnivView, UnivDetailView, UnivInfoView, UnivRankingView
 
 urlpatterns = [
     # 모든 대학 정보 조회
@@ -9,5 +9,5 @@ urlpatterns = [
     path('<int:univ_id>/', UnivDetailView.as_view(), name='univ-detail'),
     # 대학 기본 정보들
     path('info/', UnivInfoView.as_view(), name='univ-info'),
-
+    path('rankings/', UnivRankingView.as_view(), name='univ-rankings'),
 ]
