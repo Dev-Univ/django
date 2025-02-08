@@ -31,8 +31,11 @@ class UnivDetailView(GenericAPIView):
             univ = univService.get_univ(univ_id)
             serializer = UnivResponseSerializer(univ)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-        except Univ.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(
+                data={'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class UnivInfoView(GenericAPIView):
