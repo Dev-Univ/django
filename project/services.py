@@ -228,9 +228,9 @@ class ProjectService:
         ).select_related('user').order_by('-created_at')
 
     @transaction.atomic
-    def get_projects_by_univ_code(self, univ_code):
+    def get_projects_by_univ_code(self, univ_id):
         return Project.objects.filter(
-            project_univs__univ__code=univ_code
+            project_univs__univ__id=univ_id
             ).prefetch_related(
             'tech_stacks__tech_stack',
         ).select_related('user').order_by('-created_at')[:4]

@@ -87,10 +87,10 @@ class ProjectListView(GenericAPIView):
 class UnivProjectListView(GenericAPIView):
 
     @permission_classes([AllowAny])
-    def get(self, request, univ_code):
+    def get(self, request, univ_id):
         project_service = ProjectService()
 
-        projects = project_service.get_projects_by_univ_code(univ_code)
+        projects = project_service.get_projects_by_univ_code(univ_id)
 
         response_serializer = ProjectListSerializer(projects, many=True)
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
