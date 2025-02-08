@@ -81,3 +81,15 @@ class ProjectListView(GenericAPIView):
 
         response_serializer = ProjectListSerializer(projects, many=True)
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+
+
+class ProjectRelatedListView(GenericAPIView):
+
+    @permission_classes([AllowAny])
+    def get(self, request, project_id):
+        project_service = ProjectService()
+
+        projects = project_service.get_related_projects(project_id)
+
+        response_serializer = ProjectListSerializer(projects, many=True)
+        return Response(data=response_serializer.data, status=status.HTTP_200_OK)

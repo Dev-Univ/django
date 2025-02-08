@@ -79,6 +79,35 @@ class ProjectService:
         return queryset.order_by('-created_at')
 
     @transaction.atomic
+    def get_related_projects(self, project_id, limit=3):
+        current_project = Project.objects.get(id=project_id)
+
+        # 제목과 설명에서 키워드 추출
+        keywords = []
+
+        # 제목과 설명을 합쳐서 공백으로 분리
+        words = (current_project.title + " " + current_project.short_description).split()
+
+        # 2글자 이상인 단어만 키워드로 선택 (특수문자 제거)
+        keywords = [word.strip('.,!?()') for word in words if len(word.strip('.,!?()')) > 1]
+
+        # 상위 3개 키워드만 사용
+        main_keywords = keywords[:3]
+
+        # 키워드를 포함하는 프로젝트 검색
+        related_query = Q()
+        for keyword in main_keywords:
+            related_query |= Q(title__icontains=keyword) | Q(short_description__icontains=keyword)
+
+        related_projects = Project.objects.filter(
+            related_query
+        ).exclude(
+            id=project_id
+        ).distinct().order_by('-created_at')[:limit]
+
+        return related_projects
+
+    @transaction.atomic
     def update_project(self, project_id, validated_data, user):
         try:
             project = Project.objects.get(id=project_id)
