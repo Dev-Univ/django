@@ -73,7 +73,8 @@ class ProjectService:
             queryset = queryset.filter(
                 Q(title__icontains=search_query) |
                 Q(short_description__icontains=search_query) |
-                Q(tech_stacks__tech_stack__title__icontains=search_query)
+                Q(tech_stacks__tech_stack__title__icontains=search_query) |
+                Q(project_univs__univ__name__icontains=search_query)
             ).distinct()
 
         return queryset.order_by('-created_at')
