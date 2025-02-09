@@ -142,6 +142,9 @@ class UnivService:
             'details': {
                 'project_count': univ.total_projects,
                 'completed_projects': univ.completed_projects,
+                'project_score': univ.project_score,
+                'completion_score': univ.completion_score,
+                'quality_score': univ.quality_score,
                 'completed_ratio': round(univ.completed_ratio, 1),
                 'avg_features': round(univ.avg_features, 1),
                 'avg_tech_stacks': round(univ.avg_tech_stacks, 1)
