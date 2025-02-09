@@ -19,3 +19,7 @@ class NoticeService:
             queryset = queryset.filter(category=category)
 
         return queryset.order_by('-created_at')
+
+    @transaction.atomic
+    def get_notice(self, id):
+        return Notice.objects.get(id=id)

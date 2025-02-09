@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from user.models import User
+
 
 class NoticeResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -10,4 +12,4 @@ class NoticeResponseSerializer(serializers.Serializer):
     updated_at = serializers.DateTimeField()
     is_pinned = serializers.BooleanField()
     is_active = serializers.BooleanField()
-    author = serializers.CharField()
+    author = serializers.CharField(source='author.name')

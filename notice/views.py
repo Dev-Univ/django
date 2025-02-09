@@ -5,6 +5,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from notice.models import Notice
 from notice.serializers import NoticeResponseSerializer
 from notice.services import NoticeService
 from utils.paginations import CustomPagination
@@ -27,3 +28,19 @@ class NoticeView(GenericAPIView):
             data=paginator.get_paginated_response(response_serializer.data),
             status=status.HTTP_200_OK
         )
+
+
+class NoticeDetailView(GenericAPIView):
+
+    @permission_classes([AllowAny])
+    def get(self, request, id):
+        notice_service = NoticeService()
+
+        try:
+            notice = notice_service.get_notice(id)
+            response_serializer = NoticeResponseSerializer(notice)
+            return Response(data=response_serializer.data, status=status.HTTP_200_OK)
+        except Notice.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
