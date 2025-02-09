@@ -22,6 +22,7 @@ class UnivInfoResponseSerializer(serializers.Serializer):
 
 class UnivRankingDetailSerializer(serializers.Serializer):
     project_count = serializers.IntegerField()
+    completed_projects = serializers.IntegerField()
     completed_ratio = serializers.FloatField()
     avg_features = serializers.FloatField()
     avg_tech_stacks = serializers.FloatField()

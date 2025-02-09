@@ -141,6 +141,7 @@ class UnivService:
             'total_score': round(univ.total_score, 2),
             'details': {
                 'project_count': univ.total_projects,
+                'completed_projects': univ.completed_projects,
                 'completed_ratio': round(univ.completed_ratio, 1),
                 'avg_features': round(univ.avg_features, 1),
                 'avg_tech_stacks': round(univ.avg_tech_stacks, 1)
