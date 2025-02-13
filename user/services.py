@@ -52,3 +52,8 @@ class UserService:
         ).prefetch_related(
             'tech_stacks'
         ).get(id=user.id)
+
+    @transaction.atomic
+    def withdraw_user(self, user):
+        # 사용자 계정 삭제
+        user.delete()

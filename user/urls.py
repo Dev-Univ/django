@@ -4,7 +4,7 @@ from dj_rest_auth.registration.views import RegisterView
 from dj_rest_auth.views import LoginView, LogoutView
 from rest_framework_simplejwt.views import TokenVerifyView
 
-from user.views import KakaoLoginView, KakaoCallbackView, UserProfileView
+from user.views import KakaoLoginView, KakaoCallbackView, UserProfileView, UserWithdrawalView
 
 urlpatterns = [
     # dj-rest-auth URLs
@@ -20,4 +20,5 @@ urlpatterns = [
 
     # 사용자 프로필
     path('profile/<str:email>/', UserProfileView.as_view(), name='user-profile'),
+    path('profile/<str:email>/withdraw/', UserWithdrawalView.as_view(), name='user-withdrawal'),
 ]

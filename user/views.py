@@ -162,3 +162,29 @@ class KakaoCallbackView(APIView):
             )
 
         return user
+
+
+class UserWithdrawalView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, email):
+        # 본인 계정만 탈퇴 가능하도록 체크
+        if email != request.user.email:
+            return Response(
+                {"detail": "You can only withdraw your own account."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        userService = UserService()
+
+        try:
+            userService.withdraw_user(request.user)
+            return Response(
+                {"detail": "Account successfully deleted."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "Failed to withdraw account."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
