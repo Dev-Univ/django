@@ -78,7 +78,7 @@ class UnivService:
 
         if rankings is None:
             rankings = self._calculate_rankings()
-            cache.set(cache_key, rankings, 60 * 60 * 24)  # 24시간 캐시
+            cache.set(cache_key, rankings, 60 * 60)  # 1시간 캐시
 
         return rankings
 
