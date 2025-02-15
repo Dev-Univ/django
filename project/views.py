@@ -70,6 +70,23 @@ class ProjectDetailView(GenericAPIView):
         response_serializer = ProjectResponseSerializer(project)
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
+    @permission_classes([IsAuthenticated])
+    def delete(self, request, project_id):
+        project_service = ProjectService()
+
+        try:
+            project_service.delete_project(project_id, request.user)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Project.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(
+                data={'error': str(e)},
+                status=status.HTTP_403_FORBIDDEN
+                if 'Permission denied' in str(e)
+                else status.HTTP_400_BAD_REQUEST
+            )
+
 
 # todo: 나중에 쿼리 파라미터로 통합하기
 class ProjectListView(GenericAPIView):

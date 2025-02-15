@@ -236,6 +236,23 @@ class ProjectService:
             'tech_stacks__tech_stack',
         ).select_related('user').order_by('-created_at')[:4]
 
+    @transaction.atomic
+    def delete_project(self, project_id, user):
+        try:
+            project = Project.objects.get(id=project_id)
+
+            # 프로젝트 소유자 확인
+            if project.user != user:
+                raise Exception("Permission denied: You are not the owner of this project")
+
+            # 프로젝트 삭제
+            project.delete()
+
+        except Project.DoesNotExist:
+            raise Exception("Project not found")
+        except Exception as e:
+            raise Exception(f"Failed to delete project: {str(e)}")
+
     def _create_project_with_main_image(self, data, user):
         main_image_url = (
             self.upload_image_to_s3(data['main_image'], user, "projects/main")
