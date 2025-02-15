@@ -69,6 +69,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
     'corsheaders',
     'boto3',
+    'ckeditor',
+    'ckeditor_uploader',
     # custom apps
     "user",
     "univ",
@@ -254,3 +256,7 @@ AWS_ACCESS_KEY_ID = get_secret("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = get_secret("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = 'devu-project-images'
 AWS_S3_REGION_NAME = 'ap-northeast-2'
+
+# CKEditor 설정
+CKEDITOR_UPLOAD_PATH = "notices/images/"
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
