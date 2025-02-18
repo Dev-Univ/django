@@ -18,7 +18,7 @@ class Project(models.Model):
     read_me_content = models.TextField(blank=True, default='', max_length=25000)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # 이거는 프로젝트 생성 유저
+    # 프로젝트 생성 유저
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):

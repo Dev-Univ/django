@@ -42,7 +42,7 @@ class UnivService:
                 id__in=ProjectUniv.objects.values('univ_id').distinct()
             ).count(),
             'projects': Project.objects.select_related('user').count(),
-            'students': User.objects.filter().count(),
+            'students': User.objects.filter(profile__school__isnull=False).exclude(profile__school='').count()
         }
 
         universities = list(Univ.objects.filter(
@@ -131,6 +131,8 @@ class UnivService:
             ),
         ).annotate(
             total_score=F('project_score') + F('completion_score') + F('quality_score')
+        ).filter(
+            total_score__gt=0
         ).order_by('-total_score')
 
         return [{
