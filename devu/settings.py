@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'boto3',
     'ckeditor',
     'ckeditor_uploader',
+    'storages',
     # custom apps
     "user",
     "univ",
@@ -173,12 +174,6 @@ USE_I18N = False
 
 USE_TZ = False
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -256,11 +251,24 @@ SOCIALACCOUNT_AUTO_SIGNUP = True          # 소셜 로그인 시 자동 회원�
 # SOCIALACCOUNT_EMAIL_REQUIRED = True        # 소셜 계정에서도 이메일 필수
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # 소셜 계정 이메일 인증 불필요
 
-# s3
+
+# 이미지 업로드용 S3 설정
 AWS_ACCESS_KEY_ID = get_secret("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = get_secret("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = 'devu-project-images'
 AWS_S3_REGION_NAME = 'ap-northeast-2'
+
+# for admin static files
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+# Static 파일용 S3 설정
+AWS_QUERYSTRING_AUTH = False
+AWS_STATIC_BUCKET_NAME = get_secret("AWS_STATIC_BUCKET_NAME")
+
+STATIC_URL = f'https://{AWS_STATIC_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/static/admin/'
+STATICFILES_STORAGE = 'devu.storages.StaticStorage'
 
 # CKEditor 설정
 CKEDITOR_UPLOAD_PATH = "notices/images/"
