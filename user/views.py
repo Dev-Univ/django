@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from .serializers import UserProfileRequestSerializer, UserSerializer, \
-    PrivateUserProfileResponseSerializer, PublicUserProfileResponseSerializer
+    PrivateUserProfileResponseSerializer, PublicUserProfileResponseSerializer, UserSetUpRequestSerializer
 from .services import UserService
 from urllib.parse import urlencode
 
@@ -53,6 +53,26 @@ class UserProfileView(GenericAPIView):
         return Response(data=response_serializer.data, status=status.HTTP_200_OK)
 
 
+class UserSetUpView(GenericAPIView):
+
+    @permission_classes([IsAuthenticated])
+    def post(self, request):
+        request_serializer = UserSetUpRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        data = request_serializer.validated_data
+
+        if data['selected_profile'] == 'custom':
+            user.name = data['name']
+            user.profile_image_url = ''
+
+        user.is_initial_profile_set = True
+        user.save()
+
+        return Response(status=status.HTTP_200_OK)
+
+
 class KakaoLoginView(APIView):
     def get(self, request):
         client_id = settings.KAKAO_CONFIG['KAKAO_REST_API_KEY']
@@ -80,7 +100,6 @@ class KakaoCallbackView(APIView):
 
         # 액세스 토큰 받기
         token_response = self.get_kakao_token(code)
-        print(token_response)
         if not token_response.get('access_token'):
             return Response({'error': 'Failed to get access token'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -90,7 +109,7 @@ class KakaoCallbackView(APIView):
         if not user_info:
             return Response({'error': 'Failed to get user info'},
                             status=status.HTTP_400_BAD_REQUEST)
-        print(user_info)
+
         # 사용자 생성 또는 로그인 처리
         user = self.get_or_create_user(user_info)
 
@@ -104,7 +123,7 @@ class KakaoCallbackView(APIView):
         }
 
         # 프론트엔드로 리다이렉트 (토큰과 함께)
-        redirect_uri = f"http://localhost:3000/login/kakao-callback?access={tokens['access']}&refresh={tokens['refresh']}&email={user.email}"
+        redirect_uri = f"http://localhost:3000/login/kakao-callback?access={tokens['access']}&refresh={tokens['refresh']}&email={user.email}&name={user.name}&profile_image_url={user.profile_image_url}&is_initial_profile_set={user.is_initial_profile_set}"
         return redirect(redirect_uri)
 
     def get_kakao_token(self, code):
@@ -150,15 +169,19 @@ class KakaoCallbackView(APIView):
             user = User.objects.get(email=email)
             # 기존 사용자의 카카오 정보 업데이트
             user.kakao_id = str(user_info.get('id'))
-            user.profile_image_url = str(kakao_account.get('profile', {}).get('thumbnail_image_url', ''))
+            user.social_profile_name = str(kakao_account.get('profile', {}).get('nickname', '')),
+            if user.profile_image_url != '':
+                user.profile_image_url = str(kakao_account.get('profile', {}).get('thumbnail_image_url', ''))
             user.save()
         except User.DoesNotExist:
             # 새로운 사용자 생성
             user = User.objects.create_user(
                 email=email,
                 name=kakao_account.get('profile', {}).get('nickname', ''),
+                social_profile_name=kakao_account.get('profile', {}).get('nickname', ''),
                 kakao_id=str(user_info.get('id')),
                 profile_image_url=kakao_account.get('profile', {}).get('thumbnail_image_url', ''),
+                is_initial_profile_set=False
             )
 
         return user

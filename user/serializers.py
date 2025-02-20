@@ -12,6 +12,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
+class UserSetUpRequestSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=100)
+    selected_profile = serializers.CharField(max_length=100)
+
+
 class UserResponseSerializer(serializers.Serializer):
     email = serializers.EmailField()
     name = serializers.CharField()
