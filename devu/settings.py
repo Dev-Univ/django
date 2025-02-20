@@ -40,10 +40,15 @@ SECRET_KEY = get_secret("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    # "0q9rfaxll2.execute-api.ap-northeast-2.amazonaws.com",
+    "*"
+]
 
 # CORS 설정
 CORS_ALLOWED_ORIGINS = [
+    # "https://devu.me",
+    # "http://devu.me",
     "http://localhost:3000",
 ]
 

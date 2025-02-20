@@ -18,6 +18,12 @@ class UserService:
     def update_user_profile(self, profile_data, user):
         tech_stack_codes = profile_data.pop('tech_stacks', [])
 
+        # name은 User 모델에 있으므로 따로 처리
+        name = profile_data.pop('name', None)
+        if name:
+            user.name = name
+            user.save()
+
         # 유저 프로필이 있으면 가져오고 없으면 생성
         profile, created = UserProfile.objects.get_or_create(user=user)
 

@@ -30,7 +30,8 @@ class UserProfileTechStackRequestSerializer(serializers.Serializer):
 
 
 class UserProfileRequestSerializer(serializers.Serializer):
-    school = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    name = serializers.CharField(max_length=50)
+    school = serializers.CharField(max_length=100, allow_blank=True)
     major = serializers.CharField(max_length=100, required=False, allow_blank=True)
     self_introduction = serializers.CharField(max_length=1000)
     github_url = serializers.CharField(max_length=255, required=False, allow_blank=True)
