@@ -123,7 +123,7 @@ class KakaoCallbackView(APIView):
         }
 
         # 프론트엔드로 리다이렉트 (토큰과 함께)
-        redirect_uri = f"http://localhost:3000/login/kakao-callback?access={tokens['access']}&refresh={tokens['refresh']}&email={user.email}&name={user.name}&profile_image_url={user.profile_image_url}&is_initial_profile_set={user.is_initial_profile_set}"
+        redirect_uri = f"https://devu.me/login/kakao-callback?access={tokens['access']}&refresh={tokens['refresh']}&email={user.email}&name={user.name}&profile_image_url={user.profile_image_url}&is_initial_profile_set={user.is_initial_profile_set}"
         return redirect(redirect_uri)
 
     def get_kakao_token(self, code):

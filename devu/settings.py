@@ -38,17 +38,19 @@ def get_secret(setting, secrets=secrets):
 SECRET_KEY = get_secret("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
+LAMBDA_URL = get_secret("LAMBDA_URL")
 
 ALLOWED_HOSTS = [
-    # "0q9rfaxll2.execute-api.ap-northeast-2.amazonaws.com",
-    "*"
+    LAMBDA_URL,
+    "127.0.0.1"
 ]
 
 # CORS 설정
 CORS_ALLOWED_ORIGINS = [
-    # "https://devu.me",
-    # "http://devu.me",
+    "https://devu.me",
+    "http://devu.me",
     "http://localhost:3000",
 ]
 
@@ -74,8 +76,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
     'corsheaders',
     'boto3',
-    'ckeditor',
-    'ckeditor_uploader',
+    'django_ckeditor_5',
     'storages',
     # custom apps
     "user",
@@ -135,10 +136,10 @@ WSGI_APPLICATION = 'devu.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'password1234',
-        'HOST': 'localhost',
+        'NAME': 'devu',
+        'USER': get_secret("DB_USER"),
+        'PASSWORD': get_secret("DB_PASSWORD"),
+        'HOST': get_secret("DB_HOST"),
         'PORT': '5432',
     }
 }
@@ -270,6 +271,29 @@ AWS_STATIC_BUCKET_NAME = get_secret("AWS_STATIC_BUCKET_NAME")
 STATIC_URL = f'https://{AWS_STATIC_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/static/admin/'
 STATICFILES_STORAGE = 'devu.storages.StaticStorage'
 
-# CKEditor 설정
-CKEDITOR_UPLOAD_PATH = "notices/images/"
+# CKEditor 5 설정
+CKEDITOR_5_UPLOAD_PATH = "notices/images/"
+CKEDITOR_5_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# CKEditor 5 설정 추가
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
