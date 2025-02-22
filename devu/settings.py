@@ -279,8 +279,36 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 # CKEditor 5 설정 추가
 CKEDITOR_5_CONFIGS = {
     'default': {
-        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
-                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+        'toolbar': [
+            'heading', '|',
+            'fontSize', 'fontFamily', '|',  # 글자 크기와 폰트 추가
+            'bold', 'italic', 'link', '|',
+            'bulletedList', 'numberedList', 'indent', 'outdent', '|',
+            'blockQuote'
+        ],
+        'fontSize': {
+            'options': [
+                9,
+                11,
+                13,
+                'default',  # 기본 크기
+                17,
+                19,
+                21
+            ]
+        },
+        'heading': {
+            'options': [
+                { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+                { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+                { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+                { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+            ]
+        },
+        'height': '300px',
+        'width': '100%',
+        'removePlugins': ['Title'],
+        'allowedContent': True,
     }
 }
 
