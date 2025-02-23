@@ -44,7 +44,8 @@ LAMBDA_URL = get_secret("LAMBDA_URL")
 
 ALLOWED_HOSTS = [
     LAMBDA_URL,
-    "127.0.0.1"
+    "127.0.0.1",
+    "localhost"
 ]
 
 # CORS 설정
@@ -195,6 +196,8 @@ KAKAO_CONFIG = {
     "KAKAO_REDIRECT_URI": get_secret("KAKAO_REDIRECT_URI"),
     "KAKAO_CLIENT_SECRET": get_secret("KAKAO_CLIENT_SECRET"),
 }
+
+FRONT_REDIRECT_URL = get_secret("FRONT_REDIRECT_URL")
 
 # DRF, Simple-JWT
 REST_FRAMEWORK = {
