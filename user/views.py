@@ -125,7 +125,7 @@ class KakaoCallbackView(APIView):
         front_redirect_uri = settings.FRONT_REDIRECT_URL
 
         # 프론트엔드로 리다이렉트 (토큰과 함께)
-        redirect_uri = f"{front_redirect_uri}login/kakao-callback?access={tokens['access']}&refresh={tokens['refresh']}&email={user.email}&name={user.name}&profile_image_url={user.profile_image_url}&is_initial_profile_set={user.is_initial_profile_set}"
+        redirect_uri = f"{front_redirect_uri}login/kakao-callback/?access={tokens['access']}&refresh={tokens['refresh']}&email={user.email}&name={user.name}&profile_image_url={user.profile_image_url}&is_initial_profile_set={user.is_initial_profile_set}"
         return redirect(redirect_uri)
 
     def get_kakao_token(self, code):
@@ -145,7 +145,7 @@ class KakaoCallbackView(APIView):
             'client_secret': client_secret,
         }
 
-        response = requests.post(token_url, data=data, headers=headers)
+        response = requests.post(token_url, data=data, headers=headers, timeout=10)
         return response.json()
 
     def get_kakao_user_info(self, access_token):
@@ -155,7 +155,7 @@ class KakaoCallbackView(APIView):
             'Content-type': 'application/x-www-form-urlencoded;charset=utf-8'
         }
 
-        response = requests.get(user_info_url, headers=headers)
+        response = requests.get(user_info_url, headers=headers, timeout=10)
         return response.json()
 
     def get_or_create_user(self, user_info):
