@@ -141,18 +141,18 @@ class UnivService:
                 distinct=True
             ),
         ).annotate(
-            # 프로젝트 점수: 프로젝트 수에 따라 자연스럽게 증가 (0.6 제곱근 사용)
+            # 프로젝트 점수 (100-1000 범위)
             project_score=Case(
                 When(total_projects__gt=0,
-                     then=Cast(300 * Power(F('total_projects'), 0.6), FloatField())),
-                default=Value(0.0, output_field=FloatField())
+                     then=Cast(100 + 1900 * (1 - 1 / Power(F('total_projects') + 1, 0.5)), FloatField())),
+                default=Value(100.0, output_field=FloatField())
             ),
 
-            # 진행도 점수: 실제 진행 상태의 가중 평균
+            # 진행도 점수 (100-1000 범위)
             completion_score=Case(
                 When(total_projects__gt=0,
                      then=Cast(
-                         500 * (
+                         100 + 1900 * (
                                  F('planning_projects') * status_weights['PLANNING'] +
                                  F('in_progress_projects') * status_weights['IN_PROGRESS'] +
                                  F('completed_projects') * status_weights['COMPLETED'] +
@@ -160,26 +160,25 @@ class UnivService:
                          ) / F('total_projects'),
                          FloatField()
                      )),
-                default=Value(0.0, output_field=FloatField())
+                default=Value(100.0, output_field=FloatField())
             ),
 
-            # 품질 점수: 실제 구현된 것들의 평균으로 계산
+            # 품질 점수 (100-1000 범위)
             quality_score=Case(
                 When(total_projects__gt=0,
                      then=Cast(
-                         300 * (
-                                 F('avg_features') + F('avg_tech_stacks') + F('avg_time_lines') +
-                                 Cast(F('avg_team_size'), FloatField()) / 5.0 +
-                                 Cast(F('unique_tech_categories'), FloatField()) / 3.0
-                         ) / 7.0,
+                         100 + 1900 * (1 - 1 / Power(
+                             F('avg_features') + F('avg_tech_stacks') + F('avg_time_lines') + 1,
+                             0.5
+                         )),
                          FloatField()
                      )),
-                default=Value(0.0, output_field=FloatField())
+                default=Value(100.0, output_field=FloatField())
             )
         ).annotate(
             total_score=F('project_score') + F('completion_score') + F('quality_score')
         ).filter(
-            total_score__gt=0
+            total_score__gt=300
         ).order_by('-total_score')
 
         return [{
