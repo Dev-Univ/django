@@ -190,6 +190,7 @@ class ProjectResponseSerializer(serializers.Serializer):
     is_owner = serializers.SerializerMethodField()
     read_me_content = serializers.CharField()
     created_at = serializers.DateTimeField()
+    views = serializers.IntegerField()
 
     def get_is_owner(self, obj):
         request = self.context.get('request')
@@ -207,3 +208,4 @@ class ProjectListSerializer(serializers.Serializer):
     main_image_url = serializers.CharField(max_length=255)
     tech_stacks = ProjectTechStackResponseSerializer(many=True)
     created_at = serializers.DateTimeField()
+    views = serializers.IntegerField()
