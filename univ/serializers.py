@@ -43,3 +43,4 @@ class UnivRankingSerializer(serializers.Serializer):
 class UnivRankingResponseSerializer(serializers.Serializer):
     rankings = UnivRankingSerializer(many=True)
     total_count = serializers.IntegerField()
+    performance = serializers.DictField(required=False)  # 성능 정보를 위한 선택적 필드

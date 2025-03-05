@@ -64,19 +64,25 @@ class UnivRankingView(GenericAPIView):
         대학 랭킹 조회
         - region: 지역별 필터링
         - limit: 상위 N개 대학 필터링
+        - debug: 성능 정보 포함 (선택적)
         """
         univService = UnivService()
 
         try:
-            rankings = univService.get_univ_rankings()
+            # 시간 정보를 포함하여 받음
+            rankings, time_info = univService.get_univ_rankings()
 
             # 필터링 적용
-            rankings = self._apply_filters(rankings, request.query_params)
+            filtered_rankings = self._apply_filters(rankings, request.query_params)
 
             response_data = {
-                'rankings': rankings,
-                'total_count': len(rankings)
+                'rankings': filtered_rankings,
+                'total_count': len(filtered_rankings)
             }
+
+            # debug 파라미터가 있을 경우에만 성능 정보 포함
+            if request.query_params.get('debug') == 'true':
+                response_data['performance'] = time_info
 
             serializer = UnivRankingResponseSerializer(response_data)
             return Response(serializer.data, status=status.HTTP_200_OK)
