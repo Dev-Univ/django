@@ -73,14 +73,32 @@ class UnivService:
 
     @transaction.atomic
     def get_univ_rankings(self):
+        import time
+        start_time = time.time()
+
         cache_key = 'university_rankings'
         rankings = cache.get(cache_key)
+        cache_hit = rankings is not None
 
         if rankings is None:
+            # 캐시 미스 시 계산 시작 시간
+            calc_start_time = time.time()
             rankings = self._calculate_rankings()
-            cache.set(cache_key, rankings, 60 * 60)  # 1시간 캐시
+            calc_time = (time.time() - calc_start_time) * 1000
 
-        return rankings
+            cache.set(cache_key, rankings, 60 * 60)  # 1시간 캐시
+        else:
+            calc_time = None  # 캐시 히트일 경우 계산 시간 없음
+
+        end_time = time.time()
+        response_time = (end_time - start_time) * 1000  # ms로 변환
+
+        # 원래 반환 값과 시간 정보를 함께 튜플로 반환
+        return rankings, {
+            'response_time_ms': round(response_time, 2),
+            'calculation_time_ms': round(calc_time, 2) if calc_time else None,
+            'cache_hit': cache_hit
+        }
 
     def _calculate_rankings(self):
         # 프로젝트 상태별 가중치
