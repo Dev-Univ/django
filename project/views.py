@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from datetime import datetime
+
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework.decorators import permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
 
 from utils.paginations import CustomPagination
 from .models import Project
@@ -50,10 +51,31 @@ class ProjectDetailView(GenericAPIView):
 
         try:
             project = project_service.get_project(project_id)
+
+            # 조회수 증가 로직 구현
+            # 클라이언트 IP 가져오기
+            ip_address = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip() or request.META.get('REMOTE_ADDR')
+
+            # 캐시 유효 시간을 1시간으로 설정하고 캐시 키에는 시간 정보를 포함하지 않음
+            cache_key = f'project_view_{project_id}_{ip_address}'
+            cache.set(cache_key, True, 60 * 60)  # 1시간(3600초) 유지
+
+            # 캐시에서 조회 기록 확인
+            viewed = cache.get(cache_key)
+
+            # 해당 시간에 처음 조회하는 경우에만 조회수 증가
+            if not viewed:
+                project.views += 1
+                project.save(update_fields=['views'])
+
+                # 조회 기록 캐싱 (1시간 유지)
+                cache.set(cache_key, True, 60 * 60)  # 1시간 유지
+
             response_serializer = ProjectResponseSerializer(
                 project,
                 context={'request': request}
             )
+
             return Response(data=response_serializer.data, status=status.HTTP_200_OK)
         except Project.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
