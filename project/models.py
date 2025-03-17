@@ -9,8 +9,8 @@ from .choices import ProjectMemberRole, TechStackCategoryChoices, TechStackSubCa
 class Project(models.Model):
     title = models.CharField(max_length=100)
     form_mode = models.CharField(choices=ProjectSaveForm.choices, max_length=50, default=ProjectSaveForm.BASIC_FORM)
-    start_date = models.DateField(null=True)
-    end_date = models.DateField(null=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
     status = models.CharField(choices=ProjectStatus.choices, max_length=50, default=ProjectStatus.COMPLETED)
     short_description = models.CharField(max_length=100)
     description = models.TextField(max_length=20000)
@@ -21,6 +21,7 @@ class Project(models.Model):
     views = models.PositiveIntegerField(default=0)
     # 프로젝트 생성 유저
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_public = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title
