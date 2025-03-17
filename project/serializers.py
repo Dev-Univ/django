@@ -191,6 +191,7 @@ class ProjectResponseSerializer(serializers.Serializer):
     read_me_content = serializers.CharField()
     created_at = serializers.DateTimeField()
     views = serializers.IntegerField()
+    is_public = serializers.BooleanField()
 
     def get_is_owner(self, obj):
         request = self.context.get('request')
@@ -209,3 +210,4 @@ class ProjectListSerializer(serializers.Serializer):
     tech_stacks = ProjectTechStackResponseSerializer(many=True)
     created_at = serializers.DateTimeField()
     views = serializers.IntegerField()
+    is_public = serializers.BooleanField()

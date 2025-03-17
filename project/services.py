@@ -65,7 +65,7 @@ class ProjectService:
 
     @transaction.atomic
     def get_projects(self, search_query=None):
-        queryset = Project.objects.prefetch_related(
+        queryset = Project.objects.filter(is_public=True).prefetch_related(
             'tech_stacks__tech_stack',
         ).select_related('user')
 
@@ -101,7 +101,8 @@ class ProjectService:
             related_query |= Q(title__icontains=keyword) | Q(short_description__icontains=keyword)
 
         related_projects = Project.objects.filter(
-            related_query
+            related_query,
+            is_public=True
         ).exclude(
             id=project_id
         ).distinct().order_by('-created_at')[:limit]
@@ -224,14 +225,15 @@ class ProjectService:
 
     @transaction.atomic
     def get_projects_by_user_email(self, user_email):
-        return Project.objects.filter(user__email=user_email).prefetch_related(
+        return Project.objects.filter(user__email=user_email, is_public=True).prefetch_related(
             'tech_stacks__tech_stack',
         ).select_related('user').order_by('-created_at')
 
     @transaction.atomic
     def get_projects_by_univ_code(self, univ_id):
         return Project.objects.filter(
-            project_univs__univ__id=univ_id
+            project_univs__univ__id=univ_id,
+            is_public=True
             ).prefetch_related(
             'tech_stacks__tech_stack',
         ).select_related('user').order_by('-created_at')[:4]
